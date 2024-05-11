@@ -1,24 +1,12 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, RobustScaler, StandardScaler
-import tensorflow as tf
-from keras.layers import Dropout, TimeDistributed
-from keras.models import Sequential
-from keras.layers import LSTM, Dense
-from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
-from lightgbm import LGBMRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -62,8 +50,8 @@ predicted_economic_data = pd.DataFrame(forecast, columns=economic_columns, index
 predicted_economic_data_de = scaler.inverse_transform(predicted_economic_data)
 predicted_economic_data_denorm =pd.DataFrame(predicted_economic_data_de, columns=economic_columns, index=future_months)
 
-print("Predicted Economic Data for Next 3 Years:")
-predicted_economic_data_denorm
+st.write("Predicted Economic Data for Next 3 Years:")
+st.write(predicted_economic_data_denorm)
 
 
 predicted_economic_data_jan_norm = predicted_economic_data[predicted_economic_data.index.month == 1]

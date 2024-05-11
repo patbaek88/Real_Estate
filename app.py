@@ -35,7 +35,7 @@ economic_data_norm = pd.DataFrame(economic_data_norm1, columns=economic_columns,
 #미래경제데이터 생성 (VAR모델)
 #maxlags = 17
 #maxlags = 19
-maxlags = st.number_input('몇개의 6개월단위 과거데이터를 활용하겠습니까? ( ex) 17 = 8년6개월)', 1,30, value=17)
+maxlags = st.number_input('몇개의 6개월단위 과거데이터를 활용하겠습니까? (17 = 8년6개월)', 1,30, value=17)
 
 # VAR 모델 학습
 model = VAR(economic_data_norm)

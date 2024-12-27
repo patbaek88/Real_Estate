@@ -232,7 +232,7 @@ predicted_my_land_price2 = predicted_my_land_price_df*69*2.2/100000000
 
 
 # 그래프 시각화 (all)
-graph, plt = plt.figure(figsize=(10, 6))
+graph = plt.figure(figsize=(10, 6))
 
 # 실제 시장가격 그래프에 표시
 plt.plot(data_df_my.index, data_df_myp["my_land_price"]*69*2.2/100000000, label='Actual my_land_price', marker='o', color = "blue")

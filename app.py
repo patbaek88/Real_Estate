@@ -37,19 +37,19 @@ economic_data_norm = pd.DataFrame(economic_data_norm1, columns=economic_columns,
 #미래경제데이터 생성 (VAR모델)
 #maxlags = 17
 #maxlags = 19
-maxlags = st.number_input('몇개의 과거데이터로 예측 하겠습니까? (17 = 8년6개월)', 1,30, value=17)
+maxlags = st.number_input('Max Lag 설정 (5 = 2년6개월)', 1,30, value=5)
 
 # VAR 모델 학습
 model = VAR(economic_data_norm)
 lag_selection = model.select_order(maxlags=maxlags)
 optimal_lag = lag_selection.selected_orders['aic']
-st.write("Optimal lag:", optimal_lag)
+st.write("Optimal Lag:", optimal_lag)
 
 results = model.fit(optimal_lag)  # 과거 12개월의 데이터를 사용하여 학습
 
 # 미래 36개월(3년) 예측
 forecast_steps = 6
-forecast = results.forecast(economic_data_norm.values[:], forecast_steps)  # 과거 모든 데이터에서 예측
+forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps)  # 과거 모든 데이터에서 예측
 
 # 예측된 데이터 프레임으로 변환
 future_months = pd.date_range(start="2025-01-01", periods=forecast_steps, freq='6MS')

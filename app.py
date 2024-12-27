@@ -43,8 +43,8 @@ maxlags = st.number_input('몇개의 6개월단위 과거데이터를 활용하�
 model = VAR(economic_data_norm)
 results = model.fit(maxlags=maxlags)  # 과거 12개월의 데이터를 사용하여 학습
 adf_test = adfuller(economic_data_norm)
-st.write("ADF Statistic:", adf_test[0])
-st.write("p-value:", adf_test[1])
+st.write(adf_test[0])
+st.write(adf_test[1])
 
 
 # 미래 36개월(3년) 예측

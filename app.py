@@ -44,7 +44,7 @@ model = VAR(economic_data_norm)
 results = model.fit(maxlags=maxlags)  # 과거 12개월의 데이터를 사용하여 학습
 
 lag_selection = model.select_order(maxlags=maxlags)
-st.write(lag_selection.summary())
+st.write(lag_selection)
 
 
 # 미래 36개월(3년) 예측

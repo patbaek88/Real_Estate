@@ -46,7 +46,7 @@ forecast_steps = 6
 forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps)  # 과거 모든 데이터에서 예측
 
 # 예측된 데이터 프레임으로 변환
-future_months = pd.date_range(start="2024-07-01", periods=forecast_steps, freq='6MS')
+future_months = pd.date_range(start="2025-01-01", periods=forecast_steps, freq='6MS')
 predicted_economic_data = pd.DataFrame(forecast, columns=economic_columns, index=future_months)
 
 predicted_economic_data_de = scaler.inverse_transform(predicted_economic_data)

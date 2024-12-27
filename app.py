@@ -250,7 +250,7 @@ plt.legend()
 plt.xticks(rotation=45)
 plt.grid(True)
 plt.tight_layout()
-plt.show()
+#plt.show()
 
 #st.set_option('deprecation.showPyplotGlobalUse', False)
 st.pyplot(graph)

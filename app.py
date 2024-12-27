@@ -49,8 +49,12 @@ st.write("Optimal Lag:", optimal_lag)
 results = model.fit(optimal_lag)  # 과거 12개월의 데이터를 사용하여 학습
 
 residuals = results.resid
-lb_test = acorr_ljungbox(residuals, lags = [optimal_lag], return_df = True)
-st.write(lb_test)
+
+for col in residuals.columns:
+  st.write(f"---Ljung-Box Test for {col} ---")
+  lb_test = acorr_ljungbox(residuals[col], lags = [optimal_lag], return_df = True)
+  st.write(lb_test)
+
 st.write("AIC:", results.aic)
 st.write("BIC:", results.bic)
 

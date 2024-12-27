@@ -176,6 +176,7 @@ feature_names_my = Xmy.columns.tolist()
 #        best_model_my = pipeline_my
 
 best_model_my = XGBRegressor(objective='reg:squarederror')
+best_model_my.fit(Xmy_train, ymy_train)
 
 # 향후 시점 가격변동률 예측
 #def predict_future_price(model, X):

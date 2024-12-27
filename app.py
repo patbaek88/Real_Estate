@@ -12,6 +12,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 import seaborn as sns
 from statsmodels.tsa.vector_ar.var_model import VAR
+from statsmodels.tools.eval_measures import aic, bic
 import streamlit as st
 
 # 데이터 로드 및 전처리

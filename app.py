@@ -37,14 +37,13 @@ economic_data_norm = pd.DataFrame(economic_data_norm1, columns=economic_columns,
 #미래경제데이터 생성 (VAR모델)
 #maxlags = 17
 #maxlags = 19
-maxlags = st.number_input('몇개의 6개월단위 과거데이터를 활용하겠습니까? (17 = 8년6개월)', 1,30, value=17)
+maxlags = st.number_input('몇개의 과거데이터로 예측 하겠습니까? (17 = 8년6개월)', 1,30, value=17)
 
 # VAR 모델 학습
 model = VAR(economic_data_norm)
 results = model.fit(maxlags=maxlags)  # 과거 12개월의 데이터를 사용하여 학습
-adf_test = adfuller(economic_data_norm)
-st.write(adf_test[0])
-st.write(adf_test[1])
+
+
 
 
 # 미래 36개월(3년) 예측

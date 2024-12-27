@@ -95,42 +95,45 @@ X_train, X_test, y2_train, y2_test = train_test_split(X, y2, test_size=0.2, rand
 feature_names = X.columns.tolist()
 
 # 머신러닝 모델 비교
-models2 = {
-    'Random Forest': RandomForestRegressor(),
-    'Gradient Boosting': GradientBoostingRegressor(),
-    'Ridge': Ridge(),
-    'SVR': SVR(),
-    'XGBoost': XGBRegressor(objective='reg:squarederror'),
+#models2 = {
+#    'Random Forest': RandomForestRegressor(),
+#    'Gradient Boosting': GradientBoostingRegressor(),
+#    'Ridge': Ridge(),
+#    'SVR': SVR(),
+#    'XGBoost': XGBRegressor(objective='reg:squarederror'),
     #'LightGBM': LGBMRegressor()
-}
+#}
 
-best_model2 = None
-best_mse2 = float('inf')
+#best_model2 = None
+#best_mse2 = float('inf')
 
-for name, model in models2.items():
-    # 파이프라인 구성
-    pipeline2 = Pipeline([
-        #('imputer', SimpleImputer(strategy='mean')),
-        #('scaler', StandardScaler()),
-        ('model', model)
-    ])
+#for name, model in models2.items():
+#    # 파이프라인 구성
+#    pipeline2 = Pipeline([
+#        #('imputer', SimpleImputer(strategy='mean')),
+#        #('scaler', StandardScaler()),
+#        ('model', model)
+#    ])
 
     
     # 모델 학습
-    pipeline2.fit(X_train, y2_train)
+#    pipeline2.fit(X_train, y2_train)
        
     # 예측
-    predictions2 = pipeline2.predict(X_test)
+#    predictions2 = pipeline2.predict(X_test)
     
     # 모델 평가
-    mse2 = mean_squared_error(y2_test, predictions2)
+#    mse2 = mean_squared_error(y2_test, predictions2)
         
     # 최적의 모델 선택
-    if mse2 < best_mse2:
-        best_mse2 = mse2
-        best_model2 = pipeline2    
+#    if mse2 < best_mse2:
+#        best_mse2 = mse2
+#        best_model2 = pipeline2    
 
-    
+best_model2 = XGBRegressor(objective='reg:squarederror')
+best_model2.fit(X_train, y2_train)
+
+
 # Train/Test 분할
 Xmy_train, Xmy_test, ymy_train, ymy_test = train_test_split(Xmy, ymy, test_size=0.2, random_state = 881030)
 
@@ -138,41 +141,42 @@ Xmy_train, Xmy_test, ymy_train, ymy_test = train_test_split(Xmy, ymy, test_size=
 feature_names_my = Xmy.columns.tolist()
 
 # 머신러닝 모델 비교
-models_my = {
-    'Random Forest': RandomForestRegressor(),
-    'Gradient Boosting': GradientBoostingRegressor(),
-    'Ridge': Ridge(),
-    'SVR': SVR(),
-    'XGBoost': XGBRegressor(objective='reg:squarederror'),
-    #'LightGBM': LGBMRegressor()
-}
+#models_my = {
+#    'Random Forest': RandomForestRegressor(),
+#    'Gradient Boosting': GradientBoostingRegressor(),
+#    'Ridge': Ridge(),
+#    'SVR': SVR(),
+#    'XGBoost': XGBRegressor(objective='reg:squarederror'),
+#    #'LightGBM': LGBMRegressor()
+#}
 
-best_model_my = None
-best_mse_my = float('inf')
+#best_model_my = None
+#best_mse_my = float('inf')
 
-for name, model in models_my.items():
-    # 파이프라인 구성
-    pipeline_my = Pipeline([
-        #('scaler', StandardScaler()),
-        ('model', model)
-    ])
+#for name, model in models_my.items():
+#    # 파이프라인 구성
+#    pipeline_my = Pipeline([
+#        #('scaler', StandardScaler()),
+#        ('model', model)
+#    ])
     
     # 모델 학습
-    pipeline_my.fit(Xmy_train, ymy_train)
+#    pipeline_my.fit(Xmy_train, ymy_train)
     
     # 예측
-    predictions_my = pipeline_my.predict(Xmy_test)
+#    predictions_my = pipeline_my.predict(Xmy_test)
     
     # 모델 평가
-    mse_my = mean_squared_error(ymy_test, predictions_my)
+ #   mse_my = mean_squared_error(ymy_test, predictions_my)
 
     
     # 최적의 모델 선택
-    if mse_my < best_mse_my:
-        best_mse_my = mse_my
-        best_model_my = pipeline_my
+#    if mse_my < best_mse_my:
+#        best_mse_my = mse_my
+#        best_model_my = pipeline_my
 
-        
+best_model_my = XGBRegressor(objective='reg:squarederror')
+
 # 향후 시점 가격변동률 예측
 #def predict_future_price(model, X):
  #   future_features = pd.DataFrame(columns=X.columns)

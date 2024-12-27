@@ -71,6 +71,11 @@ predicted_economic_data_denorm =pd.DataFrame(predicted_economic_data_de, columns
 
 st.write("Predicted Economic Data for Next 3 Years:")
 st.write(predicted_economic_data_denorm)
+st.link_button("exchange_rate Reference", url = "http://www.smbs.biz/ExRate/MonAvgStdExRate.jsp")
+st.link_button("kr_interest_rate Reference", url = "https://www.bok.or.kr/portal/singl/baseRate/list.do?dataSeCd=01&menuNo=200643")
+st.link_button("us_interest_rate Reference", url = "https://ko.tradingeconomics.com/united-states/interest-rate")
+st.link_button("oil_price Reference", url = "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=RBRTE&f=M")
+st.link_button("kr_price_index Reference", url = "https://tradingeconomics.com/south-korea/consumer-price-index-cpi")
 
 
 predicted_economic_data_jan_norm = predicted_economic_data[predicted_economic_data.index.month == 1]
@@ -272,11 +277,6 @@ plt.tight_layout()
 #st.set_option('deprecation.showPyplotGlobalUse', False)
 st.pyplot(graph)
 
-st.link_button("exchange_rate Reference", url = "http://www.smbs.biz/ExRate/MonAvgStdExRate.jsp")
-st.link_button("kr_interest_rate Reference", url = "https://www.bok.or.kr/portal/singl/baseRate/list.do?dataSeCd=01&menuNo=200643")
-st.link_button("us_interest_rate Reference", url = "https://ko.tradingeconomics.com/united-states/interest-rate")
-st.link_button("oil_price Reference", url = "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=RBRTE&f=M")
-st.link_button("kr_price_index Reference", url = "https://tradingeconomics.com/south-korea/consumer-price-index-cpi")
 
 
 

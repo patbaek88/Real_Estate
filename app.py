@@ -252,6 +252,6 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-st.set_option('deprecation.showPyplotGlobalUse', False)
+#st.set_option('deprecation.showPyplotGlobalUse', False)
 st.pyplot()
 

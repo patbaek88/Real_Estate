@@ -12,6 +12,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 import seaborn as sns
 from statsmodels.tsa.vector_ar.var_model import VAR
+from statsmodels.stats.diagnostic import acorr_ljungbox
 #from statsmodels.tools.eval_measures import aic, bic
 from statsmodels.tsa.stattools import adfuller
 import streamlit as st
@@ -46,6 +47,11 @@ optimal_lag = lag_selection.selected_orders['aic']
 st.write("Optimal Lag:", optimal_lag)
 
 results = model.fit(optimal_lag)  # 과거 12개월의 데이터를 사용하여 학습
+
+lb_test = acorr_ljungbox(residuals, lags = [optimal_lag], return_df = True)
+st.write(lb_test)
+st.write("AIC:", results.aic)
+st.write("BIC:", results.bic)
 
 # 미래 36개월(3년) 예측
 forecast_steps = 6

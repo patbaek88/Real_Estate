@@ -275,7 +275,7 @@ plt.grid(True)
 plt.tight_layout()
 #plt.show()
 st.write("APT2 model: ", best_model2)
-st.wirte("My land model: ", best_model_my)
+st.write("My land model: ", best_model_my)
 
 #st.set_option('deprecation.showPyplotGlobalUse', False)
 st.pyplot(graph)

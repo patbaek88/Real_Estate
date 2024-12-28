@@ -120,7 +120,7 @@ feature_names = X.columns.tolist()
 # 머신러닝 모델 비교
 models2 = {
     'Random Forest': RandomForestRegressor(),
-#    'Gradient Boosting': GradientBoostingRegressor(),
+    'Gradient Boosting': GradientBoostingRegressor(),
     'Ridge': Ridge(),
     'SVR': SVR(),
 #    'XGBoost': XGBRegressor(objective='reg:squarederror'),
@@ -166,7 +166,7 @@ feature_names_my = Xmy.columns.tolist()
 # 머신러닝 모델 비교
 models_my = {
     'Random Forest': RandomForestRegressor(),
-#    'Gradient Boosting': GradientBoostingRegressor(),
+    'Gradient Boosting': GradientBoostingRegressor(),
     'Ridge': Ridge(),
     'SVR': SVR(),
 #    'XGBoost': XGBRegressor(objective='reg:squarederror'),

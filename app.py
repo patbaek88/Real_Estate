@@ -123,7 +123,7 @@ models2 = {
     'Gradient Boosting': GradientBoostingRegressor(),
     'Ridge': Ridge(),
     'SVR': SVR(),
-#    'XGBoost': XGBRegressor(objective='reg:squarederror'),
+    'XGBoost': XGBRegressor(objective='reg:squarederror'),
 #    'LightGBM': LGBMRegressor()
 }
 
@@ -169,7 +169,7 @@ models_my = {
     'Gradient Boosting': GradientBoostingRegressor(),
     'Ridge': Ridge(),
     'SVR': SVR(),
-#    'XGBoost': XGBRegressor(objective='reg:squarederror'),
+    'XGBoost': XGBRegressor(objective='reg:squarederror'),
 #    'LightGBM': LGBMRegressor()
 }
 

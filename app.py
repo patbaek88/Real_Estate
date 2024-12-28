@@ -121,10 +121,10 @@ feature_names = X.columns.tolist()
 models2 = {
     'Random Forest': RandomForestRegressor(),
     'Gradient Boosting': GradientBoostingRegressor(),
-    'Ridge': Ridge(),
+ #   'Ridge': Ridge(),
     'SVR': SVR(),
-    'XGBoost': XGBRegressor(objective='reg:squarederror'),
-#    'LightGBM': LGBMRegressor()
+ #   'XGBoost': XGBRegressor(objective='reg:squarederror'),
+    'LightGBM': LGBMRegressor()
 }
 
 best_model2 = None
@@ -167,10 +167,10 @@ feature_names_my = Xmy.columns.tolist()
 models_my = {
     'Random Forest': RandomForestRegressor(),
     'Gradient Boosting': GradientBoostingRegressor(),
-    'Ridge': Ridge(),
+#    'Ridge': Ridge(),
     'SVR': SVR(),
-    'XGBoost': XGBRegressor(objective='reg:squarederror'),
-#    'LightGBM': LGBMRegressor()
+#    'XGBoost': XGBRegressor(objective='reg:squarederror'),
+    'LightGBM': LGBMRegressor()
 }
 
 best_model_my = None

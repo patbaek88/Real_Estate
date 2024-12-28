@@ -124,7 +124,7 @@ models2 = {
  #   'Ridge': Ridge(),
     'SVR': SVR(),
  #   'XGBoost': XGBRegressor(objective='reg:squarederror'),
-    'LightGBM': LGBMRegressor()
+ #   'LightGBM': LGBMRegressor()
 }
 
 best_model2 = None
@@ -170,7 +170,7 @@ models_my = {
 #    'Ridge': Ridge(),
     'SVR': SVR(),
 #    'XGBoost': XGBRegressor(objective='reg:squarederror'),
-    'LightGBM': LGBMRegressor()
+#    'LightGBM': LGBMRegressor()
 }
 
 best_model_my = None

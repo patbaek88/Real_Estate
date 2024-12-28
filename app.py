@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from lightgbm import LGBMRegressor
 from sklearn.svm import SVR
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_squared_error

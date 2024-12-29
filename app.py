@@ -170,6 +170,7 @@ models_my = {
     'Gradient Boosting': GradientBoostingRegressor(),
 #    'Ridge': Ridge(),
     'SVR': SVR(),
+    'XGBoost': XGBRegressor(),
 #    'XGBoost': XGBRegressor(objective='reg:squarederror'),
 #    'LightGBM': LGBMRegressor()
 }

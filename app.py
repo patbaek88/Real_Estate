@@ -333,7 +333,8 @@ plt.plot(data_df_apt2.index, data_df_apt2['apt2_price'], label='Actual apt2_pric
 
 # 향후 36개월 동안 예측 시장가격 표시
 plt.scatter(predicted_my_land_price_df.index, predicted_my_land_price_df*69*2.5/100000000, label='Future_my_land_price', marker='^', color = "blue")
-plt.scatter(predicted_apt2_price_denorm2.index, predicted_apt2_price_denorm2 , label='Future_price_apt2', marker='^', color = "orange")
+plt.scatter(predicted_apt2_price_denorm2.index, predicted_apt2_price_denorm2 , label='Predicted_price_apt2', marker='x', color = "orange")
+plt.scatter(predicted_apt2_price_denorm2_t_list.index, predicted_apt2_price_denorm2_t_list , label='Predicted_price_apt2', marker='x', color = "orange")
 
 
 plt.xlabel('Date')

@@ -187,10 +187,9 @@ for name, model in models_my.items():
         best_mse_my = mse_my
         best_model_my = pipeline_my
 
-start_date = "2020-01-01"
+start_date = pd.to_datetime("2020-01-01")
 
-st.write(X)
-
+st.write(start_date)
 
 
 

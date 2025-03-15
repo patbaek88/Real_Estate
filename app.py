@@ -58,7 +58,7 @@ next_point_str = str(next_point.strftime('%Y-%m-%d'))
 st.write(next_point_str)
 
 # 예측된 데이터 프레임으로 변환
-future_months = pd.date_range(start="next_point", periods=forecast_steps, freq='6MS')
+future_months = pd.date_range(start="next_point_str", periods=forecast_steps, freq='6MS')
 predicted_economic_data = pd.DataFrame(forecast, columns=economic_columns, index=future_months)
 
 predicted_economic_data_de = scaler.inverse_transform(predicted_economic_data)

@@ -189,7 +189,7 @@ for name, model in models_my.items():
 
 start_date = pd.to_datetime("2020-01-01")
 
-X_trimmed = X[X.index >= start_date]
+X_trimmed = X[X.index <= start_date]
 st.write(X_trimmed)
 
 

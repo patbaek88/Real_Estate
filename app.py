@@ -198,7 +198,7 @@ end_date = last_time
 predicted_apt2_price_denorm2_df = pd.DataFrame()
 
 # 반복문을 사용하여 start_date가 2025-01-01이 될 때까지 6개월씩 더함
-while start_date < end_date:
+while start_date <= end_date:
     
     # 데이터 정규화
     scaler_t = RobustScaler()

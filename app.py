@@ -187,102 +187,103 @@ for name, model in models_my.items():
         best_mse_my = mse_my
         best_model_my = pipeline_my
 
+# 초기 start_date 설정
 start_date = pd.to_datetime("2020-01-01")
 
+# 6개월씩 더해가며 반복할 때 2025-01-01까지 반복
+end_date = pd.to_datetime("2025-01-01")
 
+# 반복문을 사용하여 start_date가 2025-01-01이 될 때까지 6개월씩 더함
+while start_date < end_date:
+    # start_date 기준으로 데이터를 트리밍
+    economic_data_trimmed = economic_data[economic_data.index < start_date]
 
-economic_data_trimmed = economic_data[economic_data.index <= start_date]
+    # 데이터 정규화
+    economic_data_trimmed_norm1 = scaler.fit_transform(economic_data_trimmed)
+    economic_data_trimmed_norm = pd.DataFrame(economic_data_trimmed_norm1, columns=economic_columns, index=economic_data_trimmed.index)
 
-economic_data_trimmed_norm1 = scaler.fit_transform(economic_data_trimmed)
-economic_data_trimmed_norm = pd.DataFrame(economic_data_trimmed_norm1, columns=economic_columns, index=economic_data_trimmed.index)
+    # VAR 모델 학습
+    model_t = VAR(economic_data_trimmed_norm)
+    lag_selection_t = model_t.select_order(maxlags=maxlags)
+    optimal_lag_t = lag_selection_t.selected_orders['aic']
+    st.write("Optimal Lag:", optimal_lag_t)
 
-# VAR 모델 학습
-model_t = VAR(economic_data_trimmed_norm)
-lag_selection_t = model_t.select_order(maxlags=maxlags)
-optimal_lag_t = lag_selection_t.selected_orders['aic']
-st.write("Optimal Lag:", optimal_lag_t)
+    results_t = model_t.fit(optimal_lag_t)  
 
-results_t = model_t.fit(optimal_lag_t)  
+    st.write("AIC:", results_t.aic)
+    st.write("BIC:", results_t.bic)
 
-st.write("AIC:", results_t.aic)
-st.write("BIC:", results_t.bic)
+    # 미래 6개월 후 예측
+    forecast_steps_t = 1
+    forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-maxlags:], forecast_steps_t)  
 
-# 미래 6개월후 예측
-forecast_steps_t = 1
-forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-maxlags:], forecast_steps_t)  
+    # 예측된 데이터 프레임으로 변환
+    future_months_t = pd.date_range(start=start_date, periods=forecast_steps_t, freq='1MS')
+    predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=future_months_t)
 
+    predicted_economic_data_t_de = scaler.inverse_transform(predicted_economic_data_t)
+    predicted_economic_data_t_denorm = pd.DataFrame(predicted_economic_data_t_de, columns=economic_columns, index=future_months_t)
 
-# 예측된 데이터 프레임으로 변환
-future_months_t = pd.date_range(start=start_date, periods=forecast_steps_t, freq='1MS')
-predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=future_months_t)
+    # scaler2_t 설정 및 데이터 트리밍
+    scaler2_t = RobustScaler()
+    data_df_apt2_t = data_df_apt2[data_df_apt2.index <= start_date]
 
-predicted_economic_data_t_de = scaler.inverse_transform(predicted_economic_data_t)
-predicted_economic_data_t_denorm =pd.DataFrame(predicted_economic_data_t_de, columns=economic_columns, index=future_months_t)
+    data_df_apt2_norm1_t = scaler2_t.fit_transform(data_df_apt2_t)
+    data_df_apt2_norm_t = pd.DataFrame(data_df_apt2_norm1_t, columns=["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "apt2_price"], index=data_df_apt2_t.index)
 
-scaler2_t = RobustScaler()
-data_df_apt2_t = data_df_apt2[data_df_apt2.index <= start_date]
+    # 특성과 타겟 분리
+    X_t = data_df_apt2_norm_t[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
+    y2_t = data_df_apt2_norm_t['apt2_price']
 
-data_df_apt2_norm1_t = scaler2_t.fit_transform(data_df_apt2_t)
-data_df_apt2_norm_t = pd.DataFrame(data_df_apt2_norm1_t, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index","apt2_price"]], index=data_df_apt2_t.index)
+    X_trimmed = X_t[X_t.index < start_date]
+    y2_trimmed = y2_t[y2_t.index < start_date]
 
+    # Train/Test 분할
+    X_trimmed_train, X_trimmed_test, y2_trimmed_train, y2_trimmed_test = train_test_split(X_trimmed, y2_trimmed, test_size=0.2, random_state=20211227)
 
+    # 머신러닝 모델 비교
+    models2_t = {
+        'Random Forest': RandomForestRegressor(),
+        'Gradient Boosting': GradientBoostingRegressor(),
+        'SVR': SVR(),
+    }
 
-# 특성과 타겟 분리
-X_t = data_df_apt2_norm_t[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
-y2_t = data_df_apt2_norm_t['apt2_price']
+    best_model2_t = None
+    best_mse2_t = float('inf')
 
+    for name, model in models2_t.items():
+        # 파이프라인 구성
+        pipeline2_t = Pipeline([
+            ('model', model)
+        ])
 
-
-X_trimmed = X_t[X_t.index <= start_date]
-y2_trimmed = y2_t[y2_t.index <= start_date]
-
-# Train/Test 분할
-X_trimmed_train, X_trimmed_test, y2_trimmed_train, y2_trimmed_test = train_test_split(X_trimmed, y2_trimmed, test_size=0.2, random_state = 20211227)
-
-# 머신러닝 모델 비교
-models2_t = {
-    'Random Forest': RandomForestRegressor(),
-    'Gradient Boosting': GradientBoostingRegressor(),
- #   'Ridge': Ridge(),
-    'SVR': SVR(),
- #   'XGBoost': XGBRegressor(objective='reg:squarederror'),
- #   'LightGBM': LGBMRegressor()
-}
-
-best_model2_t = None
-best_mse2_t = float('inf')
-
-for name, model in models2_t.items():
-    # 파이프라인 구성
-    pipeline2_t = Pipeline([
-        ('model', model)
-    ])
-
-    
-    # 모델 학습
-    pipeline2_t.fit(X_trimmed_train, y2_trimmed_train)
-       
-    # 예측
-    predictions2_t = pipeline2_t.predict(X_trimmed_test)
-    
-    # 모델 평가
-    mse2_t = mean_squared_error(y2_trimmed_test, predictions2_t)
+        # 모델 학습
+        pipeline2_t.fit(X_trimmed_train, y2_trimmed_train)
+           
+        # 예측
+        predictions2_t = pipeline2_t.predict(X_trimmed_test)
         
-    # 최적의 모델 선택
-    if mse2_t < best_mse2_t:
-        best_mse2_t = mse2_t
-        best_model2_t = pipeline2_t
+        # 모델 평가
+        mse2_t = mean_squared_error(y2_trimmed_test, predictions2_t)
+            
+        # 최적의 모델 선택
+        if mse2_t < best_mse2_t:
+            best_mse2_t = mse2_t
+            best_model2_t = pipeline2_t
 
-predicted_apt2_price_norm_t = best_model2_t.predict(predicted_economic_data_t)
-predicted_apt2_price_norm_df_t = pd.DataFrame(predicted_apt2_price_norm_t, index= predicted_economic_data_t.index)
-pred_apt2_df_t = pd.concat([predicted_economic_data_t,predicted_apt2_price_norm_df_t], axis =1)
+    predicted_apt2_price_norm_t = best_model2_t.predict(predicted_economic_data_t)
+    predicted_apt2_price_norm_df_t = pd.DataFrame(predicted_apt2_price_norm_t, index=predicted_economic_data_t.index)
+    pred_apt2_df_t = pd.concat([predicted_economic_data_t, predicted_apt2_price_norm_df_t], axis=1)
 
-predicted_apt2_price_de_t = scaler2_t.inverse_transform(pred_apt2_df_t)
-predicted_apt2_price_denorm_t =pd.DataFrame(predicted_apt2_price_de_t, index=predicted_economic_data_t.index)
-predicted_apt2_price_denorm2_t = predicted_apt2_price_denorm_t.drop(columns =[0,1,2,3,4])
+    predicted_apt2_price_de_t = scaler2_t.inverse_transform(pred_apt2_df_t)
+    predicted_apt2_price_denorm_t = pd.DataFrame(predicted_apt2_price_de_t, index=predicted_economic_data_t.index)
+    predicted_apt2_price_denorm2_t = predicted_apt2_price_denorm_t.drop(columns=[0, 1, 2, 3, 4])
 
-st.write(predicted_economic_data_t_denorm)
-st.write(predicted_apt2_price_denorm2_t)
+    st.write(predicted_economic_data_t_denorm)
+    st.write(predicted_apt2_price_denorm2_t)
+
+    # 6개월씩 더하기
+    start_date += relativedelta(months=6)
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)

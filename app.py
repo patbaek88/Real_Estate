@@ -59,6 +59,13 @@ def backtest(start_date):
 def forecast_future(start_date, end_date):
     # VAR 모델로 경제 지표 예측
     econ_data = data.drop(columns=targets, errors='ignore').dropna()
+    
+    # 상수값을 가지는 열 제거
+    econ_data = econ_data.loc[:, (econ_data != econ_data.iloc[0]).any()]
+    
+    if econ_data.empty:
+        raise ValueError("모든 경제 지표 데이터가 상수이거나 NaN입니다.")
+    
     var_model = VAR(econ_data)
     var_results = var_model.fit(maxlags=min(12, len(econ_data)-1))  # maxlags 조정
     future_econ = var_results.forecast(econ_data.values[-var_results.k_ar:], steps=6*6)  # 6개월 단위

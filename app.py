@@ -187,14 +187,15 @@ for name, model in models_my.items():
         best_mse_my = mse_my
         best_model_my = pipeline_my
 
+
 # 초기 start_date 설정
 start_date = pd.to_datetime("2020-01-01")
 
 # 6개월씩 더해가며 반복할 때 2025-01-01까지 반복
 end_date = last_time
 
-# 예측 결과를 저장할 리스트 초기화
-predicted_apt2_price_denorm2_t_list = []
+# 예측 결과를 저장할 빈 데이터프레임 생성
+predicted_apt2_price_denorm2_df = pd.DataFrame()
 
 # 반복문을 사용하여 start_date가 2025-01-01이 될 때까지 6개월씩 더함
 while start_date < end_date:
@@ -209,9 +210,12 @@ while start_date < end_date:
     model_t = VAR(economic_data_trimmed_norm)
     lag_selection_t = model_t.select_order(maxlags=maxlags)
     optimal_lag_t = lag_selection_t.selected_orders['aic']
-    
+    st.write("Optimal Lag:", optimal_lag_t)
+
     results_t = model_t.fit(optimal_lag_t)  
 
+    st.write("AIC:", results_t.aic)
+    st.write("BIC:", results_t.bic)
 
     # 미래 6개월 후 예측
     forecast_steps_t = 1
@@ -226,7 +230,7 @@ while start_date < end_date:
 
     # scaler2_t 설정 및 데이터 트리밍
     scaler2_t = RobustScaler()
-    data_df_apt2_t = data_df_apt2[data_df_apt2.index <= start_date]
+    data_df_apt2_t = data_df_apt2[data_df_apt2.index < start_date]
 
     data_df_apt2_norm1_t = scaler2_t.fit_transform(data_df_apt2_t)
     data_df_apt2_norm_t = pd.DataFrame(data_df_apt2_norm1_t, columns=["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "apt2_price"], index=data_df_apt2_t.index)
@@ -279,15 +283,16 @@ while start_date < end_date:
     predicted_apt2_price_denorm_t = pd.DataFrame(predicted_apt2_price_de_t, index=predicted_economic_data_t.index)
     predicted_apt2_price_denorm2_t = predicted_apt2_price_denorm_t.drop(columns=[0, 1, 2, 3, 4])
 
-    # predicted_apt2_price_denorm2_t를 리스트에 추가
-    predicted_apt2_price_denorm2_t_list.append(predicted_apt2_price_denorm2_t)
+    # 예측 결과를 데이터프레임에 추가
+    predicted_apt2_price_denorm2_df = pd.concat([predicted_apt2_price_denorm2_df, predicted_apt2_price_denorm2_t])
 
 
     # 6개월씩 더하기
     start_date += relativedelta(months=6)
 
-# 예측된 데이터 리스트 출력
-st.write(predicted_apt2_price_denorm2_t_list)
+# 최종 예측된 결과 데이터프레임 출력
+st.write(predicted_apt2_price_denorm2_df)
+
 
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
@@ -337,7 +342,7 @@ plt.plot(data_df_apt2.index, data_df_apt2['apt2_price'], label='Actual apt2_pric
 # 향후 36개월 동안 예측 시장가격 표시
 plt.scatter(predicted_my_land_price_df.index, predicted_my_land_price_df*69*2.5/100000000, label='Future_my_land_price', marker='^', color = "blue")
 plt.scatter(predicted_apt2_price_denorm2.index, predicted_apt2_price_denorm2 , label='Predicted_price_apt2', marker='x', color = "orange")
-plt.scatter(predicted_apt2_price_denorm2_t_list.index, predicted_apt2_price_denorm2_t_list , label='Predicted_price_apt2', marker='x', color = "orange")
+plt.scatter(predicted_apt2_price_denorm2_df.index, predicted_apt2_price_denorm2_df, label='Predicted_price_apt2', marker='x', color = "orange")
 
 
 plt.xlabel('Date')

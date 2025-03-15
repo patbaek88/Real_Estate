@@ -73,6 +73,9 @@ st.link_button("oil_price Reference", url = "https://www.eia.gov/dnav/pet/hist/L
 st.link_button("kr_price_index Reference", url = "https://tradingeconomics.com/south-korea/consumer-price-index-cpi")
 
 
+
+
+
 predicted_economic_data_jan_norm = predicted_economic_data[predicted_economic_data.index.month == 1]
 predicted_economic_data_jan = predicted_economic_data_denorm[predicted_economic_data_denorm.index.month == 1]
 
@@ -183,6 +186,12 @@ for name, model in models_my.items():
     if mse_my < best_mse_my:
         best_mse_my = mse_my
         best_model_my = pipeline_my
+
+start_date = "2020-01-01"
+
+st.write(X)
+
+
 
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)

@@ -4,7 +4,7 @@ from statsmodels.tsa.api import VAR
 from sklearn.ensemble import RandomForestRegressor
 import matplotlib.pyplot as plt
 
-# 데이터 불러오기 (예제 CSV 파일 가정)
+# 데이터 불러오기 (CSV 파일 가정)
 data = pd.read_csv("real_estate8.csv", parse_dates=["time"])
 data.set_index("time", inplace=True)
 
@@ -22,7 +22,7 @@ def backtest(start_date):
         X_train = train.drop(columns=targets, errors='ignore')
         y_train = train[targets]
         
-        # NaN 값이 포함된 행 제거하여 X_train과 y_train의 샘플 수를 일치시킴
+        # NaN 값이 포함된 행 제거하여 샘플 수 일치
         valid_idx = y_train.dropna().index
         X_train = X_train.loc[valid_idx]
         y_train = y_train.loc[valid_idx]
@@ -37,10 +37,7 @@ def backtest(start_date):
         pred = model.predict(X_test)[0]
         
         # my_land_price는 1년 단위 예측
-        if date.month == 1:  # 매년 1월만 예측
-            my_land_price_pred = pred[1] if "my_land_price" in targets else np.nan
-        else:
-            my_land_price_pred = np.nan
+        my_land_price_pred = pred[1] if "my_land_price" in targets and date.month == 1 else np.nan
         
         # 결과 저장
         predictions.append([date, pred[0], my_land_price_pred])
@@ -49,22 +46,23 @@ def backtest(start_date):
         train.loc[date, targets] = test.loc[date, targets]
     
     # 결과 DataFrame
-    pred_df = pd.DataFrame(predictions, columns=["date"] + targets)
-    pred_df.set_index("date", inplace=True)
+    pred_df = pd.DataFrame(predictions, columns=["time"] + targets)
+    pred_df.set_index("time", inplace=True)
     
     return pred_df
 
 # 미래 예측 (2025-07-01 ~ 2028-01-01)
 def forecast_future(start_date, end_date):
     # VAR 모델로 경제 지표 예측
-    var_model = VAR(data.drop(columns=targets, errors='ignore'))
+    econ_data = data.drop(columns=targets, errors='ignore').dropna()
+    var_model = VAR(econ_data)
     var_results = var_model.fit()
-    future_econ = var_results.forecast(data.drop(columns=targets, errors='ignore').values, steps=6*6)  # 6개월 단위
+    future_econ = var_results.forecast(econ_data.values[-var_results.k_ar:], steps=6*6)  # 6개월 단위
     future_dates = pd.date_range(start=start_date, end=end_date, freq='6M')
-    future_econ_df = pd.DataFrame(future_econ, index=future_dates, columns=data.drop(columns=targets, errors='ignore').columns)
+    future_econ_df = pd.DataFrame(future_econ, index=future_dates, columns=econ_data.columns)
     
     # 머신러닝 모델로 부동산 가격 예측
-    X_train = data.drop(columns=targets, errors='ignore')
+    X_train = econ_data
     y_train = data[targets].dropna()
     model = RandomForestRegressor()
     model.fit(X_train, y_train)
@@ -89,5 +87,3 @@ plt.plot(backtest_results.index, backtest_results["apt2_price"], label="Backtest
 plt.plot(future_forecast.index, future_forecast["apt2_price"], label="Forecast apt2_price", linestyle='dotted', color='green')
 plt.legend()
 plt.show()
-
-

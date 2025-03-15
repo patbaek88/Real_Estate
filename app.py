@@ -20,7 +20,12 @@ def backtest(start_date):
     for date in test.index:
         # 독립 변수 선택 (경제 지표 등)
         X_train = train.drop(columns=targets, errors='ignore')
-        y_train = train[targets].dropna()
+        y_train = train[targets]
+        
+        # NaN 값이 포함된 행 제거하여 X_train과 y_train의 샘플 수를 일치시킴
+        valid_idx = y_train.dropna().index
+        X_train = X_train.loc[valid_idx]
+        y_train = y_train.loc[valid_idx]
         
         if y_train.empty:
             continue

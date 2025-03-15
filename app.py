@@ -51,7 +51,7 @@ forecast_steps = 6
 forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps)  # 과거 모든 데이터에서 예측
 
 
-last_time = pd.to_datetime(data['time'].iloc[-1])
+last_time = data.index[-1]
 next_point = last_time + pd_offsets.DateOffset(months=6)
 
 # 예측된 데이터 프레임으로 변환

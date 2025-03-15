@@ -16,6 +16,7 @@ from statsmodels.tsa.vector_ar.var_model import VAR
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.tsa.stattools import adfuller
 import streamlit as st
+import pandas.tseries.offsets as pd_offsets
 
 # 데이터 로드 및 전처리
 data = pd.read_csv("real_estate7.csv")

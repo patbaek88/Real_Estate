@@ -27,13 +27,17 @@ def backtest(start_date):
         X_train = X_train.loc[valid_idx]
         y_train = y_train.loc[valid_idx]
         
-        if y_train.empty:
+        if y_train.empty or X_train.empty:
             continue
         
         # 모델 학습 및 예측
         model = RandomForestRegressor()
         model.fit(X_train, y_train)
+        
         X_test = test.loc[date].drop(targets, errors='ignore').values.reshape(1, -1)
+        if np.any(np.isnan(X_test)):
+            continue  # NaN이 포함된 경우 예측 스킵
+        
         pred = model.predict(X_test)[0]
         
         # my_land_price는 1년 단위 예측
@@ -56,7 +60,7 @@ def forecast_future(start_date, end_date):
     # VAR 모델로 경제 지표 예측
     econ_data = data.drop(columns=targets, errors='ignore').dropna()
     var_model = VAR(econ_data)
-    var_results = var_model.fit()
+    var_results = var_model.fit(maxlags=min(12, len(econ_data)-1))  # maxlags 조정
     future_econ = var_results.forecast(econ_data.values[-var_results.k_ar:], steps=6*6)  # 6개월 단위
     future_dates = pd.date_range(start=start_date, end=end_date, freq='6M')
     future_econ_df = pd.DataFrame(future_econ, index=future_dates, columns=econ_data.columns)
@@ -66,6 +70,7 @@ def forecast_future(start_date, end_date):
     y_train = data[targets].dropna()
     model = RandomForestRegressor()
     model.fit(X_train, y_train)
+    
     future_preds = model.predict(future_econ_df)
     
     # my_land_price는 1년 단위 예측

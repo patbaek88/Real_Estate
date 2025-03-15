@@ -288,6 +288,7 @@ while start_date < end_date:
 
 # 예측된 데이터 리스트 출력
 st.write(predicted_apt2_price_denorm2_t_list)
+st.write(predicted_apt2_price_denorm2)
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)

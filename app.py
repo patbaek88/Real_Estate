@@ -203,7 +203,9 @@ while start_date < end_date:
     economic_data_trimmed = economic_data[economic_data.index < start_date]
 
     # 데이터 정규화
-    economic_data_trimmed_norm1 = scaler.fit_transform(economic_data_trimmed)
+
+    scaler_t = RobustScaler()
+    economic_data_trimmed_norm1 = scaler_t.fit_transform(economic_data_trimmed)
     economic_data_trimmed_norm = pd.DataFrame(economic_data_trimmed_norm1, columns=economic_columns, index=economic_data_trimmed.index)
 
     # VAR 모델 학습
@@ -222,7 +224,7 @@ while start_date < end_date:
     future_months_t = pd.date_range(start=start_date, periods=forecast_steps_t, freq='1MS')
     predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=future_months_t)
 
-    predicted_economic_data_t_de = scaler.inverse_transform(predicted_economic_data_t)
+    predicted_economic_data_t_de = scaler_t.inverse_transform(predicted_economic_data_t)
     predicted_economic_data_t_denorm = pd.DataFrame(predicted_economic_data_t_de, columns=economic_columns, index=future_months_t)
 
     # scaler2_t 설정 및 데이터 트리밍

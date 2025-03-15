@@ -214,6 +214,9 @@ forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-2:], forecast
 future_months_t = pd.date_range(start=start_date, periods=forecast_steps_t, freq='1MS')
 predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=future_months_t)
 
+predicted_economic_data_t_de = scaler.inverse_transform(predicted_economic_data_t)
+predicted_economic_data_t_denorm =pd.DataFrame(predicted_economic_data_t_de, columns=economic_columns, index=future_months_t)
+
 X_trimmed = X[X.index <= start_date]
 y2_trimmed = y2[y2.index <= start_date]
 
@@ -258,9 +261,12 @@ predicted_apt2_price_norm_t = best_model2_t.predict(predicted_economic_data_t)
 predicted_apt2_price_norm_df_t = pd.DataFrame(predicted_apt2_price_norm_t, index= predicted_economic_data_t.index)
 pred_apt2_df_t = pd.concat([predicted_economic_data_t,predicted_apt2_price_norm_df_t], axis =1)
 
-st.write(economic_data_trimmed_norm)
-st.write(predicted_economic_data_t)
-st.write(predicted_apt2_price_norm_t)
+predicted_apt2_price_de_t = scaler2.inverse_transform(pred_apt2_df_t)
+predicted_apt2_price_denorm_t =pd.DataFrame(predicted_apt2_price_de_t, index=predicted_economic_data_t.index)
+predicted_apt2_price_denorm2_t = predicted_apt2_price_denorm_t.drop(columns =[0,1,2,3,4])
+
+st.write(predicted_economic_data_t_denorm)
+st.write(predicted_apt2_price_denorm2_t)
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)

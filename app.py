@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestRegressor
 import matplotlib.pyplot as plt
 
 # 데이터 불러오기 (예제 CSV 파일 가정)
-data = pd.read_csv("real_estate8.csv", parse_dates=[time"])
+data = pd.read_csv("real_estate8.csv", parse_dates=["time"])
 data.set_index("time", inplace=True)
 
 # 예측할 변수

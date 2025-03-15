@@ -55,7 +55,7 @@ forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps
 last_time = data.index[-1]
 next_point = last_time + relativedelta(months=6)
 next_point = next_point.strftime('%Y-%m-%d')
-st.write(next_point)
+
 
 # 예측된 데이터 프레임으로 변환
 future_months = pd.date_range(start=next_point, periods=forecast_steps, freq='6MS')
@@ -189,6 +189,8 @@ for name, model in models_my.items():
 
 start_date = pd.to_datetime("2020-01-01")
 
+
+
 economic_data_trimmed = economic_data[economic_data.index <= start_date]
 
 economic_data_trimmed_norm1 = scaler.fit_transform(economic_data_trimmed)
@@ -196,7 +198,7 @@ economic_data_trimmed_norm = pd.DataFrame(economic_data_trimmed_norm1, columns=e
 
 # VAR 모델 학습
 model_t = VAR(economic_data_trimmed_norm)
-lag_selection_t = model_t.select_order(maxlags=2)
+lag_selection_t = model_t.select_order(maxlags=maxlags)
 optimal_lag_t = lag_selection_t.selected_orders['aic']
 st.write("Optimal Lag:", optimal_lag_t)
 
@@ -207,7 +209,7 @@ st.write("BIC:", results_t.bic)
 
 # 미래 6개월후 예측
 forecast_steps_t = 1
-forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-2:], forecast_steps_t)  
+forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-maxlags:], forecast_steps_t)  
 
 
 # 예측된 데이터 프레임으로 변환
@@ -217,8 +219,21 @@ predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, i
 predicted_economic_data_t_de = scaler.inverse_transform(predicted_economic_data_t)
 predicted_economic_data_t_denorm =pd.DataFrame(predicted_economic_data_t_de, columns=economic_columns, index=future_months_t)
 
-X_trimmed = X[X.index <= start_date]
-y2_trimmed = y2[y2.index <= start_date]
+scaler2_t = RobustScaler()
+data_df_apt2_t = data_df_apt2[data_df_apt2.index <= start_date]
+data_df_apt2_norm1_t = scaler2_t.fit_transform(data_df_apt2_2)
+data_df_apt2_norm_2 = pd.DataFrame(data_df_apt2_norm1_2, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index","apt2_price"]], index=data_df_apt2.index)
+
+
+
+# 특성과 타겟 분리
+X_t = data_df_apt2_norm_t[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
+y2_t = data_df_apt2_norm_t['apt2_price']
+
+
+
+X_trimmed = X[X_t.index <= start_date]
+y2_trimmed = y2[y2_t.index <= start_date]
 
 # Train/Test 분할
 X_trimmed_train, X_trimmed_test, y2_trimmed_train, y2_trimmed_test = train_test_split(X_trimmed, y2_trimmed, test_size=0.2, random_state = 20211227)
@@ -261,7 +276,7 @@ predicted_apt2_price_norm_t = best_model2_t.predict(predicted_economic_data_t)
 predicted_apt2_price_norm_df_t = pd.DataFrame(predicted_apt2_price_norm_t, index= predicted_economic_data_t.index)
 pred_apt2_df_t = pd.concat([predicted_economic_data_t,predicted_apt2_price_norm_df_t], axis =1)
 
-predicted_apt2_price_de_t = scaler2.inverse_transform(pred_apt2_df_t)
+predicted_apt2_price_de_t = scaler2_t.inverse_transform(pred_apt2_df_t)
 predicted_apt2_price_denorm_t =pd.DataFrame(predicted_apt2_price_de_t, index=predicted_economic_data_t.index)
 predicted_apt2_price_denorm2_t = predicted_apt2_price_denorm_t.drop(columns =[0,1,2,3,4])
 

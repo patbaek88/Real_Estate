@@ -16,7 +16,7 @@ from statsmodels.tsa.vector_ar.var_model import VAR
 from statsmodels.stats.diagnostic import acorr_ljungbox
 from statsmodels.tsa.stattools import adfuller
 import streamlit as st
-import pandas.tseries.offsets as pd_offsets
+from dateutil.relativedelta import relativedelta
 
 # 데이터 로드 및 전처리
 data = pd.read_csv("real_estate7.csv")
@@ -53,7 +53,7 @@ forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps
 
 
 last_time = data.index[-1]
-next_point = last_time + pd_offsets.DateOffset(months=6)
+next_point = last_time + relativedelta(months=4)
 
 # 예측된 데이터 프레임으로 변환
 future_months = pd.date_range(start="next_point", periods=forecast_steps, freq='6MS')

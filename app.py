@@ -221,8 +221,8 @@ predicted_economic_data_t_denorm =pd.DataFrame(predicted_economic_data_t_de, col
 
 scaler2_t = RobustScaler()
 data_df_apt2_t = data_df_apt2[data_df_apt2.index <= start_date]
-data_df_apt2_norm1_t = scaler2_t.fit_transform(data_df_apt2_2)
-data_df_apt2_norm_2 = pd.DataFrame(data_df_apt2_norm1_2, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index","apt2_price"]], index=data_df_apt2.index)
+data_df_apt2_norm1_t = scaler2_t.fit_transform(data_df_apt2_t)
+data_df_apt2_norm_t = pd.DataFrame(data_df_apt2_norm1_t, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index","apt2_price"]], index=data_df_apt2.index)
 
 
 

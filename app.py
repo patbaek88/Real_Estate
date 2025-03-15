@@ -1,285 +1,78 @@
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import MinMaxScaler, MaxAbsScaler, RobustScaler, StandardScaler
+import numpy as np
+from statsmodels.tsa.api import VAR
+from sklearn.ensemble import RandomForestRegressor
 import matplotlib.pyplot as plt
-from sklearn.linear_model import Ridge
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from lightgbm import LGBMRegressor
-from sklearn.svm import SVR
-from xgboost import XGBRegressor
-from sklearn.metrics import mean_squared_error
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
-import seaborn as sns
-from statsmodels.tsa.vector_ar.var_model import VAR
-from statsmodels.stats.diagnostic import acorr_ljungbox
-#from statsmodels.tools.eval_measures import aic, bic
-from statsmodels.tsa.stattools import adfuller
-import streamlit as st
 
-# 데이터 로드 및 전처리
-data = pd.read_csv("real_estate7.csv")
-data['time'] = pd.to_datetime(data['time'])
+# 데이터 불러오기 (예제 CSV 파일 가정)
+data = pd.read_csv("real_estate_data.csv", parse_dates=["date"])
+data.set_index("date", inplace=True)
 
-data.set_index(['time'], inplace=True)
+# 예측할 변수
+targets = ["apt2_price", "my_land_price"]
 
-# 경제지표 관련 열 추출
-economic_columns = ["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]
-economic_data = data[economic_columns]
-
-# 데이터 정규화
-#scaler = StandardScaler()
-#scaler = MinMaxScaler()
-#scaler = MaxAbsScaler()
-scaler = RobustScaler()
-economic_data_norm1 = scaler.fit_transform(economic_data)
-economic_data_norm = pd.DataFrame(economic_data_norm1, columns=economic_columns, index=economic_data.index)
-
-#미래경제데이터 생성 (VAR모델)
-#maxlags = 17
-#maxlags = 19
-maxlags = st.number_input('Max Lag 설정 (5 = 2년6개월)', 1,30, value=5)
-
-# VAR 모델 학습
-model = VAR(economic_data_norm)
-lag_selection = model.select_order(maxlags=maxlags)
-optimal_lag = lag_selection.selected_orders['aic']
-st.write("Optimal Lag:", optimal_lag)
-
-results = model.fit(optimal_lag)  # 과거 12개월의 데이터를 사용하여 학습
-
-#residuals = results.resid
-
-#for col in residuals.columns:
-#  st.write(f"---Ljung-Box Test for {col} ---")
-#  lb_test = acorr_ljungbox(residuals[col], lags = [optimal_lag], return_df = True)
-#  st.write(lb_test)
-
-st.write("AIC:", results.aic)
-st.write("BIC:", results.bic)
-
-# 미래 36개월(3년) 예측
-forecast_steps = 6
-forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps)  # 과거 모든 데이터에서 예측
-
-# 예측된 데이터 프레임으로 변환
-future_months = pd.date_range(start="2025-01-01", periods=forecast_steps, freq='6MS')
-predicted_economic_data = pd.DataFrame(forecast, columns=economic_columns, index=future_months)
-
-predicted_economic_data_de = scaler.inverse_transform(predicted_economic_data)
-predicted_economic_data_denorm =pd.DataFrame(predicted_economic_data_de, columns=economic_columns, index=future_months)
-
-st.write("Predicted Economic Data for Next 3 Years:")
-st.write(predicted_economic_data_denorm)
-st.link_button("exchange_rate Reference", url = "http://www.smbs.biz/ExRate/MonAvgStdExRate.jsp")
-st.link_button("kr_interest_rate Reference", url = "https://www.bok.or.kr/portal/singl/baseRate/list.do?dataSeCd=01&menuNo=200643")
-st.link_button("us_interest_rate Reference", url = "https://ko.tradingeconomics.com/united-states/interest-rate")
-st.link_button("oil_price Reference", url = "https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=RBRTE&f=M")
-st.link_button("kr_price_index Reference", url = "https://tradingeconomics.com/south-korea/consumer-price-index-cpi")
-
-
-predicted_economic_data_jan_norm = predicted_economic_data[predicted_economic_data.index.month == 1]
-predicted_economic_data_jan = predicted_economic_data_denorm[predicted_economic_data_denorm.index.month == 1]
-
-#data_df_apt2 = data.dropna(subset=["apt2_price_rate"])
-data_df_apt2 = data.dropna(subset=["apt2_price"])
-data_df_apt2 = data_df_apt2.drop([ "apt1_price", "apt1_price_rate","apt2_price_rate","my_land_price", "my_land_price_rate"], axis=1) 
-data_df_myp = data.dropna(subset=["my_land_price"])
-data_df_my = data.dropna(subset=["my_land_price_rate"])
-data_df_my = data_df_my.drop([ "apt1_price", "apt1_price_rate","apt2_price", "apt2_price_rate","my_land_price"], axis=1) 
-                          
-                          
-#scaler2 = StandardScaler()
-scaler2 = RobustScaler()
-data_df_apt2_norm1 = scaler2.fit_transform(data_df_apt2)
-data_df_apt2_norm = pd.DataFrame(data_df_apt2_norm1, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index","apt2_price"]], index=data_df_apt2.index)
-
-#scaler3 = StandardScaler()
-scaler3 = RobustScaler()
-data_df_my_norm1 = scaler3.fit_transform(data_df_my)
-data_df_my_norm = pd.DataFrame(data_df_my_norm1, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "my_land_price_rate"]], index=data_df_my.index)
-
-
-# 특성과 타겟 분리
-X = data_df_apt2_norm[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
-#y2 = data_df_apt2['apt2_price_rate']
-y2 = data_df_apt2_norm['apt2_price']
-
-Xmy = data_df_my_norm[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
-ymy = data_df_my_norm['my_land_price_rate']  #*69*2.5/100000000
-
-
-
-# Train/Test 분할
-X_train, X_test, y2_train, y2_test = train_test_split(X, y2, test_size=0.2, random_state = 20211227)
-
-# 학습할 때 사용된 특성명 저장
-feature_names = X.columns.tolist()
-
-# 머신러닝 모델 비교
-models2 = {
-    'Random Forest': RandomForestRegressor(),
-    'Gradient Boosting': GradientBoostingRegressor(),
- #   'Ridge': Ridge(),
-    'SVR': SVR(),
- #   'XGBoost': XGBRegressor(objective='reg:squarederror'),
- #   'LightGBM': LGBMRegressor()
-}
-
-best_model2 = None
-best_mse2 = float('inf')
-
-for name, model in models2.items():
-    # 파이프라인 구성
-    pipeline2 = Pipeline([
-        #('imputer', SimpleImputer(strategy='mean')),
-        #('scaler', StandardScaler()),
-        ('model', model)
-    ])
-
+# 과거 예측 (백테스트)
+def backtest(start_date):
+    train = data.loc[:start_date].copy()
+    test = data.loc[start_date:].copy()
+    predictions = []
     
-    # 모델 학습
-    pipeline2.fit(X_train, y2_train)
-       
-    # 예측
-    predictions2 = pipeline2.predict(X_test)
-    
-    # 모델 평가
-    mse2 = mean_squared_error(y2_test, predictions2)
+    for date in test.index:
+        # 독립 변수 선택 (경제 지표 등)
+        X_train = train.drop(columns=targets)
+        y_train = train[targets]
         
-    # 최적의 모델 선택
-    if mse2 < best_mse2:
-        best_mse2 = mse2
-        best_model2 = pipeline2    
-
-#best_model2 = XGBRegressor(objective='reg:squarederror')
-#best_model2.fit(X_train, y2_train)
-
-
-# Train/Test 분할
-Xmy_train, Xmy_test, ymy_train, ymy_test = train_test_split(Xmy, ymy, test_size=0.2, random_state = 881030)
-
-# 학습할 때 사용된 특성명 저장
-feature_names_my = Xmy.columns.tolist()
-
-# 머신러닝 모델 비교
-models_my = {
-    'Random Forest': RandomForestRegressor(),
-    'Gradient Boosting': GradientBoostingRegressor(),
-#    'Ridge': Ridge(),
-    'SVR': SVR(),
-#    'XGBoost': XGBRegressor(objective='reg:squarederror'),
-#    'LightGBM': LGBMRegressor()
-}
-
-best_model_my = None
-best_mse_my = float('inf')
-
-for name, model in models_my.items():
-    # 파이프라인 구성
-    pipeline_my = Pipeline([
-        #('scaler', StandardScaler()),
-        ('model', model)
-    ])
-    
-    # 모델 학습
-    pipeline_my.fit(Xmy_train, ymy_train)
-    
-    # 예측
-    predictions_my = pipeline_my.predict(Xmy_test)
-    
-    # 모델 평가
-    mse_my = mean_squared_error(ymy_test, predictions_my)
-
-    
-    # 최적의 모델 선택
-    if mse_my < best_mse_my:
-        best_mse_my = mse_my
-        best_model_my = pipeline_my
-
-#best_model_my = XGBRegressor(objective='reg:squarederror')
-#best_model_my.fit(Xmy_train, ymy_train)
-
-# 향후 시점 가격변동률 예측
-#def predict_future_price(model, X):
- #   future_features = pd.DataFrame(columns=X.columns)
+        # 모델 학습 및 예측
+        model = RandomForestRegressor()
+        model.fit(X_train, y_train)
+        X_test = test.loc[date].drop(targets).values.reshape(1, -1)
+        pred = model.predict(X_test)[0]
         
-    # 예측할 때 사용된 특성명만 선택
-  #  future_features = future_features[feature_names]
-    
-   # future_predictions = model.predict(future_features)
-    #return future_predictions
-
-#predicted_apt2_price_rate = best_model2.predict(predicted_economic_data)
-#predicted_apt2_price_rate_df = pd.DataFrame(predicted_apt2_price_rate, index= predicted_economic_data.index)
-predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
-#predicted_apt2_price = predict_future_price(best_model2, predicted_economic_data)
-predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)
-pred_apt2_df = pd.concat([predicted_economic_data,predicted_apt2_price_norm_df], axis =1)
-
-predicted_myland_price_rate_norm = best_model_my.predict(predicted_economic_data_jan_norm)
-#predicted_myland_price = predict_future_price(best_model_my, predicted_economic_data_jan)
-predicted_myland_price_rate_norm_df = pd.DataFrame(predicted_myland_price_rate_norm, index= predicted_economic_data_jan_norm.index)
-pred_myland_df = pd.concat([predicted_economic_data_jan_norm, predicted_myland_price_rate_norm_df], axis =1)
-
-
-predicted_apt2_price_de = scaler2.inverse_transform(pred_apt2_df)
-predicted_apt2_price_denorm =pd.DataFrame(predicted_apt2_price_de, index=predicted_economic_data.index)
-predicted_apt2_price_denorm2 = predicted_apt2_price_denorm.drop(columns =[0,1,2,3,4])
-
-predicted_myland_price_rate_de = scaler3.inverse_transform(pred_myland_df)
-predicted_myland_price_rate_denorm =pd.DataFrame(predicted_myland_price_rate_de, index=predicted_economic_data_jan.index)
-predicted_myland_price_rate_denorm2 = predicted_myland_price_rate_denorm.drop(columns =[0,1,2,3,4])
-
-def calculate_future_price_my (initial_price, change_rates):
-    future_prices = []
-    last_price = initial_price
-    
-    for rate in change_rates:
-        new_price = last_price*(1+rate)
-        last_price = new_price
-        future_prices.append(new_price)
+        # 결과 저장
+        predictions.append([date, pred[0], pred[1]])
         
-    return future_prices
+        # 실제값 추가하여 점진적 예측
+        train.loc[date, targets] = test.loc[date, targets]
+    
+    # 결과 DataFrame
+    pred_df = pd.DataFrame(predictions, columns=["date"] + targets)
+    pred_df.set_index("date", inplace=True)
+    
+    return pred_df
 
+# 미래 예측 (2025-07-01 ~ 2028-01-01)
+def forecast_future(start_date, end_date):
+    # VAR 모델로 경제 지표 예측
+    var_model = VAR(data.drop(columns=targets))
+    var_results = var_model.fit()
+    future_econ = var_results.forecast(data.drop(columns=targets).values, steps=6*6)  # 6개월 단위
+    future_dates = pd.date_range(start=start_date, end=end_date, freq='6M')
+    future_econ_df = pd.DataFrame(future_econ, index=future_dates, columns=data.drop(columns=targets).columns)
+    
+    # 머신러닝 모델로 부동산 가격 예측
+    X_train = data.drop(columns=targets)
+    y_train = data[targets]
+    model = RandomForestRegressor()
+    model.fit(X_train, y_train)
+    future_preds = model.predict(future_econ_df)
+    
+    # 결과 DataFrame
+    future_df = pd.DataFrame(future_preds, index=future_dates, columns=targets)
+    return future_df
 
-#current_apt2_price = data_df_apt2['apt2_price'].iloc[-1]
-#predicted_apt2_price = calculate_future_price_my(current_apt2_price, predicted_apt2_price_rate)
-#predicted_apt2_price_df = pd.DataFrame(predicted_apt2_price, index = predicted_apt2_price_rate_df.index)
+# 실행 예제
+start_date = "2020-01-01"
+end_date = "2028-01-01"
+backtest_results = backtest(start_date)
+future_forecast = forecast_future("2025-07-01", end_date)
 
-current_land_price = data_df_myp['my_land_price'].iloc[-1]
-predicted_my_land_price = calculate_future_price_my(current_land_price, predicted_myland_price_rate_denorm2.values)
-predicted_my_land_price_df = pd.DataFrame(predicted_my_land_price, index = predicted_economic_data_jan.index)
-predicted_my_land_price2 = predicted_my_land_price_df*69*2.2/100000000
-
-
-# 그래프 시각화 (all)
-graph = plt.figure(figsize=(10, 6))
-
-# 실제 시장가격 그래프에 표시
-plt.plot(data_df_my.index, data_df_myp["my_land_price"]*69*2.2/100000000, label='Actual my_land_price', marker='o', color = "blue")
-plt.plot(data_df_apt2.index, data_df_apt2['apt2_price'], label='Actual apt2_price', marker='o', color = "orange")
-
-# 향후 24개월 동안 예측 시장가격 표시
-plt.scatter(predicted_my_land_price_df.index, predicted_my_land_price_df*69*2.5/100000000, label='Future_my_land_price', marker='^', color = "blue")
-plt.scatter(predicted_apt2_price_denorm2.index, predicted_apt2_price_denorm2 , label='Future_price_apt2', marker='^', color = "orange")
-
-
-plt.xlabel('Date')
-plt.ylabel('Price')
-plt.title('Actual and Predicted Prices')
+# 그래프 시각화
+plt.figure(figsize=(12, 6))
+plt.plot(data.index, data["apt2_price"], label="Actual apt2_price", color='blue')
+plt.plot(backtest_results.index, backtest_results["apt2_price"], label="Backtest apt2_price", linestyle='dashed', color='red')
+plt.plot(future_forecast.index, future_forecast["apt2_price"], label="Forecast apt2_price", linestyle='dotted', color='green')
 plt.legend()
-plt.xticks(rotation=45)
-plt.grid(True)
-plt.tight_layout()
-#plt.show()
-
-#st.set_option('deprecation.showPyplotGlobalUse', False)
-st.pyplot(graph)
-
-st.write("APT2 model: ", best_model2)
-st.write("My land model: ", best_model_my)
+plt.show()
 
 
 

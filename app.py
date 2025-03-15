@@ -19,17 +19,26 @@ def backtest(start_date):
     
     for date in test.index:
         # 독립 변수 선택 (경제 지표 등)
-        X_train = train.drop(columns=targets)
-        y_train = train[targets]
+        X_train = train.drop(columns=targets, errors='ignore')
+        y_train = train[targets].dropna()
+        
+        if y_train.empty:
+            continue
         
         # 모델 학습 및 예측
         model = RandomForestRegressor()
         model.fit(X_train, y_train)
-        X_test = test.loc[date].drop(targets).values.reshape(1, -1)
+        X_test = test.loc[date].drop(targets, errors='ignore').values.reshape(1, -1)
         pred = model.predict(X_test)[0]
         
+        # my_land_price는 1년 단위 예측
+        if date.month == 1:  # 매년 1월만 예측
+            my_land_price_pred = pred[1] if "my_land_price" in targets else np.nan
+        else:
+            my_land_price_pred = np.nan
+        
         # 결과 저장
-        predictions.append([date, pred[0], pred[1]])
+        predictions.append([date, pred[0], my_land_price_pred])
         
         # 실제값 추가하여 점진적 예측
         train.loc[date, targets] = test.loc[date, targets]
@@ -43,21 +52,23 @@ def backtest(start_date):
 # 미래 예측 (2025-07-01 ~ 2028-01-01)
 def forecast_future(start_date, end_date):
     # VAR 모델로 경제 지표 예측
-    var_model = VAR(data.drop(columns=targets))
+    var_model = VAR(data.drop(columns=targets, errors='ignore'))
     var_results = var_model.fit()
-    future_econ = var_results.forecast(data.drop(columns=targets).values, steps=6*6)  # 6개월 단위
+    future_econ = var_results.forecast(data.drop(columns=targets, errors='ignore').values, steps=6*6)  # 6개월 단위
     future_dates = pd.date_range(start=start_date, end=end_date, freq='6M')
-    future_econ_df = pd.DataFrame(future_econ, index=future_dates, columns=data.drop(columns=targets).columns)
+    future_econ_df = pd.DataFrame(future_econ, index=future_dates, columns=data.drop(columns=targets, errors='ignore').columns)
     
     # 머신러닝 모델로 부동산 가격 예측
-    X_train = data.drop(columns=targets)
-    y_train = data[targets]
+    X_train = data.drop(columns=targets, errors='ignore')
+    y_train = data[targets].dropna()
     model = RandomForestRegressor()
     model.fit(X_train, y_train)
     future_preds = model.predict(future_econ_df)
     
-    # 결과 DataFrame
+    # my_land_price는 1년 단위 예측
     future_df = pd.DataFrame(future_preds, index=future_dates, columns=targets)
+    future_df.loc[future_df.index.month != 1, "my_land_price"] = np.nan  # 1월이 아닌 달의 값 제거
+    
     return future_df
 
 # 실행 예제
@@ -73,6 +84,5 @@ plt.plot(backtest_results.index, backtest_results["apt2_price"], label="Backtest
 plt.plot(future_forecast.index, future_forecast["apt2_price"], label="Forecast apt2_price", linestyle='dotted', color='green')
 plt.legend()
 plt.show()
-
 
 

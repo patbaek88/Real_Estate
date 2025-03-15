@@ -76,7 +76,6 @@ st.link_button("kr_price_index Reference", url = "https://tradingeconomics.com/s
 predicted_economic_data_jan_norm = predicted_economic_data[predicted_economic_data.index.month == 1]
 predicted_economic_data_jan = predicted_economic_data_denorm[predicted_economic_data_denorm.index.month == 1]
 
-#data_df_apt2 = data.dropna(subset=["apt2_price_rate"])
 data_df_apt2 = data.dropna(subset=["apt2_price"])
 data_df_apt2 = data_df_apt2.drop([ "apt1_price", "apt1_price_rate","apt2_price_rate","my_land_price", "my_land_price_rate"], axis=1) 
 data_df_myp = data.dropna(subset=["my_land_price"])
@@ -84,12 +83,11 @@ data_df_my = data.dropna(subset=["my_land_price_rate"])
 data_df_my = data_df_my.drop([ "apt1_price", "apt1_price_rate","apt2_price", "apt2_price_rate","my_land_price"], axis=1) 
                           
                           
-#scaler2 = StandardScaler()
 scaler2 = RobustScaler()
 data_df_apt2_norm1 = scaler2.fit_transform(data_df_apt2)
 data_df_apt2_norm = pd.DataFrame(data_df_apt2_norm1, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index","apt2_price"]], index=data_df_apt2.index)
 
-#scaler3 = StandardScaler()
+
 scaler3 = RobustScaler()
 data_df_my_norm1 = scaler3.fit_transform(data_df_my)
 data_df_my_norm = pd.DataFrame(data_df_my_norm1, columns=[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "my_land_price_rate"]], index=data_df_my.index)
@@ -97,7 +95,6 @@ data_df_my_norm = pd.DataFrame(data_df_my_norm1, columns=[["exchange_rate", "kr_
 
 # 특성과 타겟 분리
 X = data_df_apt2_norm[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
-#y2 = data_df_apt2['apt2_price_rate']
 y2 = data_df_apt2_norm['apt2_price']
 
 Xmy = data_df_my_norm[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
@@ -127,8 +124,6 @@ best_mse2 = float('inf')
 for name, model in models2.items():
     # 파이프라인 구성
     pipeline2 = Pipeline([
-        #('imputer', SimpleImputer(strategy='mean')),
-        #('scaler', StandardScaler()),
         ('model', model)
     ])
 
@@ -146,9 +141,6 @@ for name, model in models2.items():
     if mse2 < best_mse2:
         best_mse2 = mse2
         best_model2 = pipeline2    
-
-#best_model2 = XGBRegressor(objective='reg:squarederror')
-#best_model2.fit(X_train, y2_train)
 
 
 # Train/Test 분할
@@ -192,28 +184,12 @@ for name, model in models_my.items():
         best_mse_my = mse_my
         best_model_my = pipeline_my
 
-#best_model_my = XGBRegressor(objective='reg:squarederror')
-#best_model_my.fit(Xmy_train, ymy_train)
 
-# 향후 시점 가격변동률 예측
-#def predict_future_price(model, X):
- #   future_features = pd.DataFrame(columns=X.columns)
-        
-    # 예측할 때 사용된 특성명만 선택
-  #  future_features = future_features[feature_names]
-    
-   # future_predictions = model.predict(future_features)
-    #return future_predictions
-
-#predicted_apt2_price_rate = best_model2.predict(predicted_economic_data)
-#predicted_apt2_price_rate_df = pd.DataFrame(predicted_apt2_price_rate, index= predicted_economic_data.index)
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
-#predicted_apt2_price = predict_future_price(best_model2, predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)
 pred_apt2_df = pd.concat([predicted_economic_data,predicted_apt2_price_norm_df], axis =1)
 
 predicted_myland_price_rate_norm = best_model_my.predict(predicted_economic_data_jan_norm)
-#predicted_myland_price = predict_future_price(best_model_my, predicted_economic_data_jan)
 predicted_myland_price_rate_norm_df = pd.DataFrame(predicted_myland_price_rate_norm, index= predicted_economic_data_jan_norm.index)
 pred_myland_df = pd.concat([predicted_economic_data_jan_norm, predicted_myland_price_rate_norm_df], axis =1)
 
@@ -237,10 +213,6 @@ def calculate_future_price_my (initial_price, change_rates):
         
     return future_prices
 
-
-#current_apt2_price = data_df_apt2['apt2_price'].iloc[-1]
-#predicted_apt2_price = calculate_future_price_my(current_apt2_price, predicted_apt2_price_rate)
-#predicted_apt2_price_df = pd.DataFrame(predicted_apt2_price, index = predicted_apt2_price_rate_df.index)
 
 current_land_price = data_df_myp['my_land_price'].iloc[-1]
 predicted_my_land_price = calculate_future_price_my(current_land_price, predicted_myland_price_rate_denorm2.values)

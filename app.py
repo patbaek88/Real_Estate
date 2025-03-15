@@ -191,7 +191,7 @@ for name, model in models_my.items():
 start_date = pd.to_datetime("2020-01-01")
 
 # 6개월씩 더해가며 반복할 때 2025-01-01까지 반복
-end_date = last_point
+end_date = last_time
 
 # 예측 결과를 저장할 리스트 초기화
 predicted_apt2_price_denorm2_t_list = []

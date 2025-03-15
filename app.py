@@ -189,10 +189,12 @@ for name, model in models_my.items():
 
 start_date = pd.to_datetime("2020-01-01")
 
+economic_data_trimmed = economic_data[economic_data.index <= start_date]
+
 X_trimmed = X[X.index <= start_date]
-st.write(X_trimmed)
+y2_trimmed = y2[y2.index <= start_date]
 
-
+st.write(economic_data_trimmed)
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)

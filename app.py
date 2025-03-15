@@ -196,7 +196,7 @@ economic_data_trimmed_norm = pd.DataFrame(economic_data_trimmed_norm1, columns=e
 
 # VAR 모델 학습
 model_t = VAR(economic_data_trimmed_norm)
-lag_selection_t = model_t.select_order(maxlags=maxlags)
+lag_selection_t = model_t.select_order(maxlags=3)
 optimal_lag_t = lag_selection_t.selected_orders['aic']
 st.write("Optimal Lag:", optimal_lag_t)
 
@@ -219,9 +219,6 @@ y2_trimmed = y2[y2.index <= start_date]
 
 # Train/Test 분할
 X_trimmed_train, X_trimmed_test, y2_trimmed_train, y2_trimmed_test = train_test_split(X_trimmed, y2_trimmed, test_size=0.2, random_state = 20211227)
-
-# 학습할 때 사용된 특성명 저장
-feature_names_t = X_trimmed.columns.tolist()
 
 # 머신러닝 모델 비교
 models2_t = {

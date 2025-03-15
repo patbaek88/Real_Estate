@@ -232,8 +232,8 @@ y2_t = data_df_apt2_norm_t['apt2_price']
 
 
 
-X_trimmed = X[X_t.index <= start_date]
-y2_trimmed = y2[y2_t.index <= start_date]
+X_trimmed = X_t[X_t.index <= start_date]
+y2_trimmed = y2_t[y2_t.index <= start_date]
 
 # Train/Test 분할
 X_trimmed_train, X_trimmed_test, y2_trimmed_train, y2_trimmed_test = train_test_split(X_trimmed, y2_trimmed, test_size=0.2, random_state = 20211227)

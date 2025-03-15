@@ -209,8 +209,10 @@ st.write("BIC:", results_t.bic)
 forecast_steps_t = 1
 forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-maxlags:], forecast_steps_t)  
 
+
 # 예측된 데이터 프레임으로 변환
-predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=start_date)
+future_months_t = pd.date_range(start=start_date, periods=forecast_steps_t, freq='1MS')
+predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=future_months_t)
 st.write(predicted_economic_data_t)
 
 X_trimmed = X[X.index <= start_date]

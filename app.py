@@ -258,6 +258,7 @@ predicted_apt2_price_norm_t = best_model2_t.predict(predicted_economic_data_t)
 predicted_apt2_price_norm_df_t = pd.DataFrame(predicted_apt2_price_norm_t, index= predicted_economic_data_t.index)
 pred_apt2_df_t = pd.concat([predicted_economic_data_t,predicted_apt2_price_norm_df_t], axis =1)
 
+st.write(economic_data_trimmed_norm)
 st.write(predicted_economic_data_t)
 st.write(predicted_apt2_price_norm_t)
 

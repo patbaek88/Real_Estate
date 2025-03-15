@@ -53,7 +53,7 @@ forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps
 
 
 last_time = data.index[-1]
-next_point = str(last_time + relativedelta(months=4))
+next_point = str(last_time + relativedelta(months=6))
 st.write(next_point)
 
 # 예측된 데이터 프레임으로 변환

@@ -34,7 +34,7 @@ economic_data_norm1 = scaler.fit_transform(economic_data)
 economic_data_norm = pd.DataFrame(economic_data_norm1, columns=economic_columns, index=economic_data.index)
 
 #미래경제데이터 생성 (VAR모델)
-maxlags = st.number_input('Max Lag 설정 (5 = 2년6개월)', 1,30, value=5)
+maxlags = st.number_input('Max Lag 설정 (3 = 1년6개월)', 1,30, value=3)
 
 # VAR 모델 학습
 model = VAR(economic_data_norm)
@@ -210,12 +210,9 @@ while start_date < end_date:
     model_t = VAR(economic_data_trimmed_norm)
     lag_selection_t = model_t.select_order(maxlags=maxlags)
     optimal_lag_t = lag_selection_t.selected_orders['aic']
-    st.write("Optimal Lag:", optimal_lag_t)
 
     results_t = model_t.fit(optimal_lag_t)  
 
-    st.write("AIC:", results_t.aic)
-    st.write("BIC:", results_t.bic)
 
     # 미래 6개월 후 예측
     forecast_steps_t = 1

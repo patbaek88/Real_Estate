@@ -213,12 +213,55 @@ forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-maxlags:], fo
 # 예측된 데이터 프레임으로 변환
 future_months_t = pd.date_range(start=start_date, periods=forecast_steps_t, freq='1MS')
 predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=future_months_t)
-st.write(predicted_economic_data_t)
 
 X_trimmed = X[X.index <= start_date]
 y2_trimmed = y2[y2.index <= start_date]
 
+# Train/Test 분할
+X_trimmed_train, X_trimmed_test, y2_trimmed_train, y2_trimmed_test = train_test_split(X_trimmed, y2_trimmed, test_size=0.2, random_state = 20211227)
 
+# 학습할 때 사용된 특성명 저장
+feature_names_t = X_trimmed.columns.tolist()
+
+# 머신러닝 모델 비교
+models2_t = {
+    'Random Forest': RandomForestRegressor(),
+    'Gradient Boosting': GradientBoostingRegressor(),
+ #   'Ridge': Ridge(),
+    'SVR': SVR(),
+ #   'XGBoost': XGBRegressor(objective='reg:squarederror'),
+ #   'LightGBM': LGBMRegressor()
+}
+
+best_model2_t = None
+best_mse2_t = float('inf')
+
+for name, model in models2_t.items():
+    # 파이프라인 구성
+    pipeline2_t = Pipeline([
+        ('model', model)
+    ])
+
+    
+    # 모델 학습
+    pipeline2_t.fit(X_trimmed_train, y2_trimmed_train)
+       
+    # 예측
+    predictions2_t = pipeline2_t.predict(X_trimmed_test)
+    
+    # 모델 평가
+    mse2_t = mean_squared_error(y2_trimmed_test, predictions2_t)
+        
+    # 최적의 모델 선택
+    if mse2_t < best_mse2_t:
+        best_mse2_t = mse2_t
+        best_model2_t = pipeline2_t
+
+predicted_apt2_price_norm_t = best_model2_t.predict(predicted_economic_data_t)
+predicted_apt2_price_norm_df_t = pd.DataFrame(predicted_apt2_price_norm_t, index= predicted_economic_data_t.index)
+pred_apt2_df_t = pd.concat([predicted_economic_data_t,predicted_apt2_price_norm_df_t], axis =1)
+
+st.write(pred_apt2_df_t)
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)

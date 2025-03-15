@@ -54,8 +54,8 @@ forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps
 
 last_time = data.index[-1]
 next_point = last_time + relativedelta(months=6)
-next_point_str = next_point.strftime('%Y-%m-%d')
-st.write(next_point_str)
+next_point = next_point.strftime('%Y-%m-%d')
+st.write(next_point)
 
 # 예측된 데이터 프레임으로 변환
 future_months = pd.date_range(start="next_point", periods=forecast_steps, freq='6MS')

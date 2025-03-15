@@ -288,7 +288,7 @@ while start_date < end_date:
 
 # 예측된 데이터 리스트 출력
 st.write(predicted_apt2_price_denorm2_t_list)
-st.write(predicted_apt2_price_denorm2)
+
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)
@@ -302,6 +302,8 @@ pred_myland_df = pd.concat([predicted_economic_data_jan_norm, predicted_myland_p
 predicted_apt2_price_de = scaler2.inverse_transform(pred_apt2_df)
 predicted_apt2_price_denorm =pd.DataFrame(predicted_apt2_price_de, index=predicted_economic_data.index)
 predicted_apt2_price_denorm2 = predicted_apt2_price_denorm.drop(columns =[0,1,2,3,4])
+
+st.write(predicted_apt2_price_denorm2)
 
 predicted_myland_price_rate_de = scaler3.inverse_transform(pred_myland_df)
 predicted_myland_price_rate_denorm =pd.DataFrame(predicted_myland_price_rate_de, index=predicted_economic_data_jan.index)

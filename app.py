@@ -206,7 +206,7 @@ st.write("AIC:", results_t.aic)
 st.write("BIC:", results_t.bic)
 
 # 미래 6개월후 예측
-forecast_steps_t = 1
+forecast_steps_t = 6
 forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-maxlags:], forecast_steps_t)  
 
 

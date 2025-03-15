@@ -199,12 +199,14 @@ predicted_apt2_price_denorm2_df = pd.DataFrame()
 
 # 반복문을 사용하여 start_date가 2025-01-01이 될 때까지 6개월씩 더함
 while start_date < end_date:
+    
+    # 데이터 정규화
+    scaler_t = RobustScaler()
+    
     # start_date 기준으로 데이터를 트리밍
     economic_data_trimmed = economic_data[economic_data.index < start_date]
 
-    # 데이터 정규화
-
-    scaler_t = RobustScaler()
+    
     economic_data_trimmed_norm1 = scaler_t.fit_transform(economic_data_trimmed)
     economic_data_trimmed_norm = pd.DataFrame(economic_data_trimmed_norm1, columns=economic_columns, index=economic_data_trimmed.index)
 

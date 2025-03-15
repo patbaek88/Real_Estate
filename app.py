@@ -191,7 +191,10 @@ for name, model in models_my.items():
 start_date = pd.to_datetime("2020-01-01")
 
 # 6개월씩 더해가며 반복할 때 2025-01-01까지 반복
-end_date = pd.to_datetime("2025-01-01")
+end_date = last_point
+
+# 예측 결과를 저장할 리스트 초기화
+predicted_apt2_price_denorm2_t_list = []
 
 # 반복문을 사용하여 start_date가 2025-01-01이 될 때까지 6개월씩 더함
 while start_date < end_date:
@@ -206,12 +209,9 @@ while start_date < end_date:
     model_t = VAR(economic_data_trimmed_norm)
     lag_selection_t = model_t.select_order(maxlags=maxlags)
     optimal_lag_t = lag_selection_t.selected_orders['aic']
-    st.write("Optimal Lag:", optimal_lag_t)
-
+    
     results_t = model_t.fit(optimal_lag_t)  
 
-    st.write("AIC:", results_t.aic)
-    st.write("BIC:", results_t.bic)
 
     # 미래 6개월 후 예측
     forecast_steps_t = 1
@@ -279,11 +279,15 @@ while start_date < end_date:
     predicted_apt2_price_denorm_t = pd.DataFrame(predicted_apt2_price_de_t, index=predicted_economic_data_t.index)
     predicted_apt2_price_denorm2_t = predicted_apt2_price_denorm_t.drop(columns=[0, 1, 2, 3, 4])
 
-    st.write(predicted_economic_data_t_denorm)
-    st.write(predicted_apt2_price_denorm2_t)
+    # predicted_apt2_price_denorm2_t를 리스트에 추가
+    predicted_apt2_price_denorm2_t_list.append(predicted_apt2_price_denorm2_t)
+
 
     # 6개월씩 더하기
     start_date += relativedelta(months=6)
+
+# 예측된 데이터 리스트 출력
+st.write(predicted_apt2_price_denorm2_t_list)
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)
@@ -327,7 +331,7 @@ graph = plt.figure(figsize=(10, 6))
 plt.plot(data_df_my.index, data_df_myp["my_land_price"]*69*2.2/100000000, label='Actual my_land_price', marker='o', color = "blue")
 plt.plot(data_df_apt2.index, data_df_apt2['apt2_price'], label='Actual apt2_price', marker='o', color = "orange")
 
-# 향후 24개월 동안 예측 시장가격 표시
+# 향후 36개월 동안 예측 시장가격 표시
 plt.scatter(predicted_my_land_price_df.index, predicted_my_land_price_df*69*2.5/100000000, label='Future_my_land_price', marker='^', color = "blue")
 plt.scatter(predicted_apt2_price_denorm2.index, predicted_apt2_price_denorm2 , label='Future_price_apt2', marker='^', color = "orange")
 

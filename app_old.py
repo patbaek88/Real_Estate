@@ -14,7 +14,6 @@ from sklearn.pipeline import Pipeline
 import seaborn as sns
 from statsmodels.tsa.vector_ar.var_model import VAR
 from statsmodels.stats.diagnostic import acorr_ljungbox
-#from statsmodels.tools.eval_measures import aic, bic
 from statsmodels.tsa.stattools import adfuller
 import streamlit as st
 
@@ -29,16 +28,11 @@ economic_columns = ["exchange_rate", "kr_interest_rate", "us_interest_rate", "oi
 economic_data = data[economic_columns]
 
 # 데이터 정규화
-#scaler = StandardScaler()
-#scaler = MinMaxScaler()
-#scaler = MaxAbsScaler()
 scaler = RobustScaler()
 economic_data_norm1 = scaler.fit_transform(economic_data)
 economic_data_norm = pd.DataFrame(economic_data_norm1, columns=economic_columns, index=economic_data.index)
 
 #미래경제데이터 생성 (VAR모델)
-#maxlags = 17
-#maxlags = 19
 maxlags = st.number_input('Max Lag 설정 (5 = 2년6개월)', 1,30, value=5)
 
 # VAR 모델 학습
@@ -49,13 +43,6 @@ st.write("Optimal Lag:", optimal_lag)
 
 results = model.fit(optimal_lag)  # 과거 12개월의 데이터를 사용하여 학습
 
-#residuals = results.resid
-
-#for col in residuals.columns:
-#  st.write(f"---Ljung-Box Test for {col} ---")
-#  lb_test = acorr_ljungbox(residuals[col], lags = [optimal_lag], return_df = True)
-#  st.write(lb_test)
-
 st.write("AIC:", results.aic)
 st.write("BIC:", results.bic)
 
@@ -63,8 +50,12 @@ st.write("BIC:", results.bic)
 forecast_steps = 6
 forecast = results.forecast(economic_data_norm.values[-maxlags:], forecast_steps)  # 과거 모든 데이터에서 예측
 
+
+last_time = pd.to_datetime(data['time'].iloc[-1])
+next_point = last_time + pd_offsets.DateOffset(months=6)
+
 # 예측된 데이터 프레임으로 변환
-future_months = pd.date_range(start="2025-01-01", periods=forecast_steps, freq='6MS')
+future_months = pd.date_range(start="next_point", periods=forecast_steps, freq='6MS')
 predicted_economic_data = pd.DataFrame(forecast, columns=economic_columns, index=future_months)
 
 predicted_economic_data_de = scaler.inverse_transform(predicted_economic_data)

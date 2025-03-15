@@ -19,7 +19,7 @@ import streamlit as st
 from dateutil.relativedelta import relativedelta
 
 # 데이터 로드 및 전처리
-data = pd.read_csv("real_estate7.csv")
+data = pd.read_csv("real_estate8.csv")
 data['time'] = pd.to_datetime(data['time'])
 
 data.set_index(['time'], inplace=True)

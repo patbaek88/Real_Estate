@@ -191,10 +191,32 @@ start_date = pd.to_datetime("2020-01-01")
 
 economic_data_trimmed = economic_data[economic_data.index <= start_date]
 
+economic_data_trimmed_norm1 = scaler.fit_transform(economic_data_trimmed)
+economic_data_trimmed_norm = pd.DataFrame(economic_data_trimmed_norm1, columns=economic_columns, index=economic_data_trimmed.index)
+
+# VAR 모델 학습
+model_t = VAR(economic_data_trimmed_norm)
+lag_selection_t = model_t.select_order(maxlags=maxlags)
+optimal_lag_t = lag_selection_t.selected_orders['aic']
+st.write("Optimal Lag:", optimal_lag_t)
+
+results_t = model_t.fit(optimal_lag_t)  
+
+st.write("AIC:", results_t.aic)
+st.write("BIC:", results_t.bic)
+
+# 미래 6개월후 예측
+forecast_steps_t = 1
+forecast_t = results_t.forecast(economic_data_trimmed_norm.values[-maxlags:], forecast_steps_t)  
+
+# 예측된 데이터 프레임으로 변환
+predicted_economic_data_t = pd.DataFrame(forecast_t, columns=economic_columns, index=start_date)
+st.write(predicted_economic_data_t)
+
 X_trimmed = X[X.index <= start_date]
 y2_trimmed = y2[y2.index <= start_date]
 
-st.write(economic_data_trimmed)
+
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)

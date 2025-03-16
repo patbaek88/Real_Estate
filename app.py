@@ -457,7 +457,7 @@ predicted_my_land_price_df = pd.DataFrame(predicted_my_land_price, index = predi
 predicted_my_land_price2 = predicted_my_land_price_df*69*2.2/100000000
 
 
-df_combined_future = pd.concat([predicted_my_land_price2, predicted_apt2_price_denorm2], axis=1)
+df_combined_future = pd.concat([predicted_my_land_price_df*69*2.5/100000000, predicted_apt2_price_denorm2], axis=1)
 df_combined_future.columns = ["predicted my_land_price", "predicted apt2_price"]  # 첫 번째 열은 1, 두 번째 열은 2로 설정
 df_combined_future["difference"] = df_combined_future["predicted my_land_price"] - df_combined_past["predicted apt2_price"]
 df_combined_future.loc[df_combined_future["predicted my_land_price"].isna(), "difference"] = None

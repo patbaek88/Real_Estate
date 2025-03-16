@@ -291,9 +291,6 @@ while start_date <= end_date:
     # 6개월씩 더하기
     start_date += relativedelta(months=6)
 
-# 최종 예측된 결과 데이터프레임 출력
-st.write(predicted_apt2_price_denorm2_df)
-
 
 
 
@@ -422,11 +419,13 @@ while start_date_m <= end_date:
     # 12개월씩 더하기
     start_date_m += relativedelta(months=12)
 
+
+
+df_combined_past = pd.concat([predicted_myland_price_denorm2_df, predicted_apt2_price_denorm2_df], axis=1)
+df_combined_past.columns = [predicted my_land_price, predicted apt2_price]  # 첫 번째 열은 1, 두 번째 열은 2로 설정
+
 # 최종 예측된 결과 데이터프레임 출력
-st.write(predicted_myland_price_denorm2_df)
-
-
-
+st.write(df_combined_past)
 
 predicted_apt2_price_norm = best_model2.predict(predicted_economic_data)
 predicted_apt2_price_norm_df = pd.DataFrame(predicted_apt2_price_norm, index= predicted_economic_data.index)

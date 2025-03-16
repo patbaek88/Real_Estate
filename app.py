@@ -336,7 +336,7 @@ while start_date_m <= end_date:
     predicted_economic_data_m_de = scaler_m.inverse_transform(predicted_economic_data_m)
     predicted_economic_data_m_denorm = pd.DataFrame(predicted_economic_data_m_de, columns=economic_columns, index=future_months_m)
 
-    st.write(predicted_economic_data_m_denorm)
+    
   
     # scaler2_m 설정 및 데이터 트리밍
     scaler2_m = RobustScaler()

@@ -380,7 +380,7 @@ while start_date <= end_date:
             best_model2_m = pipeline2_m
 
     predicted_myland_price_norm_m = best_model2_m.predict(predicted_economic_data_m)
-    predicted_myland_price_norm_df_m = pd.DataFrame(predicted_apt2_price_norm_m, index=predicted_economic_data_m.index)
+    predicted_myland_price_norm_df_m = pd.DataFrame(predicted_myland_price_norm_m, index=predicted_economic_data_m.index)
     pred_myland_df_m = pd.concat([predicted_economic_data_m, predicted_myland_price_norm_df_m], axis=1)
 
     predicted_myland_price_de_m = scaler2_m.inverse_transform(pred_myland_df_m)

@@ -388,7 +388,7 @@ while start_date <= end_date:
     predicted_myland_price_denorm2_m = predicted_myland_price_denorm_m.drop(columns=[0, 1, 2, 3, 4])
 
     # 예측 결과를 데이터프레임에 추가
-    predicted_myland_price_denorm2_df = pd.concat([predicted_myland_price_denorm2_df, predicted_apt2_price_denorm2_m])
+    predicted_myland_price_denorm2_df = pd.concat([predicted_myland_price_denorm2_df, predicted_myland_price_denorm2_m])
 
 
     # 6개월씩 더하기

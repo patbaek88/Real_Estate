@@ -423,8 +423,8 @@ while start_date_m <= end_date:
 
 df_combined_past = pd.concat([predicted_myland_price_denorm2_df, predicted_apt2_price_denorm2_df], axis=1)
 df_combined_past.columns = ["predicted my_land_price", "predicted apt2_price"]  # 첫 번째 열은 1, 두 번째 열은 2로 설정
-df_combined_past[3] = df_combined_past[1] - df_combined_past[2]  # 차이 계산
-df_combined_past.loc[df_combined_past[1].isna(), 3] = None  # 1열이 None이면 차이값도 None으로 설정
+df_combined_past["difference"] = df_combined_past["predicted my_land_price"] - df_combined_past["predicted apt2_price"]
+df_combined_past.loc[df_combined_past["predicted my_land_price"].isna(), "difference"] = None
 
 
 # 최종 예측된 결과 데이터프레임 출력

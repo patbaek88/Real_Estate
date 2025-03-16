@@ -297,6 +297,19 @@ st.write(predicted_apt2_price_denorm2_df)
 
 
 
+
+def calculate_future_price_my (initial_price, change_rates):
+    future_prices = []
+    last_price = initial_price
+    
+    for rate in change_rates:
+        new_price = last_price*(1+rate)
+        last_price = new_price
+        future_prices.append(new_price)
+        
+    return future_prices
+
+
 # 예측 결과를 저장할 빈 데이터프레임 생성
 predicted_myland_price_denorm2_df = pd.DataFrame()
 
@@ -336,11 +349,13 @@ while start_date_m <= end_date:
     predicted_economic_data_m_de = scaler_m.inverse_transform(predicted_economic_data_m)
     predicted_economic_data_m_denorm = pd.DataFrame(predicted_economic_data_m_de, columns=economic_columns, index=future_months_m)
 
-    
+    predicted_economic_data_m_jan_norm = predicted_economic_data_m[predicted_economic_data_m.index.month == 1]
+    predicted_economic_data_m_jan = predicted_economic_data_m_denorm[predicted_economic_data_m_denorm.index.month == 1]
   
     # scaler2_m 설정 및 데이터 트리밍
     scaler2_m = RobustScaler()
     data_df_my_m = data_df_my[data_df_my.index < start_date_m]
+    data_df_myp_m = data_df_myp[data_df_myp.index < start_date_m]
 
     data_df_myland_norm1_m = scaler2_m.fit_transform(data_df_my_m)
     data_df_myland_norm_m = pd.DataFrame(data_df_myland_norm1_m, columns=["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "my_land_price"], index=data_df_my_m.index)
@@ -389,15 +404,22 @@ while start_date_m <= end_date:
     predicted_myland_price_norm_df_m = pd.DataFrame(predicted_myland_price_norm_m, index=predicted_economic_data_m.index)
     pred_myland_df_m = pd.concat([predicted_economic_data_m, predicted_myland_price_norm_df_m], axis=1)
 
-    predicted_myland_price_de_m = scaler2_m.inverse_transform(pred_myland_df_m)
-    predicted_myland_price_denorm_m = pd.DataFrame(predicted_myland_price_de_m, index=predicted_economic_data_m.index)
-    predicted_myland_price_denorm2_m = predicted_myland_price_denorm_m.drop(columns=[0, 1, 2, 3, 4])
+    predicted_myland_price_rate_de_m = scaler2_m.inverse_transform(pred_myland_df_m)
+    predicted_myland_price_rate_denorm_m = pd.DataFrame(predicted_myland_price_rate_de_m, index=predicted_economic_data_m.index)
+    predicted_myland_price_rate_denorm2_m = predicted_myland_price_rate_denorm_m.drop(columns=[0, 1, 2, 3, 4])
 
+
+    current_land_price_m = data_df_myp_m['my_land_price'].iloc[-1]
+    predicted_my_land_price_m = calculate_future_price_my(current_land_price_m, predicted_myland_price_rate_denorm2.values)
+    predicted_my_land_price_df_m = pd.DataFrame(predicted_my_land_price, index = predicted_economic_data_m_jan.index)
+    predicted_my_land_price2_m = predicted_my_land_price_df_m*69*2.2/100000000
+
+  
     # 예측 결과를 데이터프레임에 추가
-    predicted_myland_price_denorm2_df = pd.concat([predicted_myland_price_denorm2_df, predicted_myland_price_denorm2_m])
+    predicted_myland_price_denorm2_df = pd.concat([predicted_myland_price_denorm2_df, predicted_my_land_price2_m])
 
 
-    # 6개월씩 더하기
+    # 12개월씩 더하기
     start_date_m += relativedelta(months=12)
 
 # 최종 예측된 결과 데이터프레임 출력
@@ -425,16 +447,7 @@ predicted_myland_price_rate_de = scaler3.inverse_transform(pred_myland_df)
 predicted_myland_price_rate_denorm =pd.DataFrame(predicted_myland_price_rate_de, index=predicted_economic_data_jan.index)
 predicted_myland_price_rate_denorm2 = predicted_myland_price_rate_denorm.drop(columns =[0,1,2,3,4])
 
-def calculate_future_price_my (initial_price, change_rates):
-    future_prices = []
-    last_price = initial_price
-    
-    for rate in change_rates:
-        new_price = last_price*(1+rate)
-        last_price = new_price
-        future_prices.append(new_price)
-        
-    return future_prices
+
 
 
 current_land_price = data_df_myp['my_land_price'].iloc[-1]

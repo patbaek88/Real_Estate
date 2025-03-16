@@ -452,6 +452,14 @@ predicted_myland_price_rate_de = scaler3.inverse_transform(pred_myland_df)
 predicted_myland_price_rate_denorm =pd.DataFrame(predicted_myland_price_rate_de, index=predicted_economic_data_jan.index)
 predicted_myland_price_rate_denorm2 = predicted_myland_price_rate_denorm.drop(columns =[0,1,2,3,4])
 
+df_combined_future = pd.concat([predicted_myland_price_rate_denorm2, predicted_apt2_price_denorm2], axis=1)
+df_combined_future.columns = ["predicted my_land_price", "predicted apt2_price"]  # 첫 번째 열은 1, 두 번째 열은 2로 설정
+df_combined_future["difference"] = df_combined_future["predicted my_land_price"] - df_combined_past["predicted apt2_price"]
+df_combined_future.loc[df_combined_future["predicted my_land_price"].isna(), "difference"] = None
+
+
+# 최종 예측된 결과 데이터프레임 출력
+st.write(df_combined_past)
 
 
 

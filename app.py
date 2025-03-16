@@ -304,13 +304,13 @@ predicted_myland_price_denorm2_df = pd.DataFrame()
 while start_date <= end_date:
     
     # 데이터 정규화
-    scaler_t_m = RobustScaler()
+    scaler_m = RobustScaler()
     
     # start_date 기준으로 데이터를 트리밍
     economic_data_trimmed_m = economic_data[economic_data.index < start_date]
 
     
-    economic_data_trimmed_norm1_m = scaler_t2.fit_transform(economic_data_trimmed_m)
+    economic_data_trimmed_norm1_m = scaler_m.fit_transform(economic_data_trimmed_m)
     economic_data_trimmed_norm_m = pd.DataFrame(economic_data_trimmed_norm1_m, columns=economic_columns, index=economic_data_trimmed_m.index)
 
     # VAR 모델 학습
@@ -329,7 +329,7 @@ while start_date <= end_date:
     future_months_m = pd.date_range(start=start_date, periods=forecast_steps_m, freq='12MS')
     predicted_economic_data_m = pd.DataFrame(forecast_m, columns=economic_columns, index=future_months_m)
 
-    predicted_economic_data_m_de = scaler_t.inverse_transform(predicted_economic_data_m)
+    predicted_economic_data_m_de = scaler_m.inverse_transform(predicted_economic_data_m)
     predicted_economic_data_m_denorm = pd.DataFrame(predicted_economic_data_m_de, columns=economic_columns, index=future_months_m)
 
     # scaler2_m 설정 및 데이터 트리밍

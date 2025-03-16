@@ -300,14 +300,18 @@ st.write(predicted_apt2_price_denorm2_df)
 # 예측 결과를 저장할 빈 데이터프레임 생성
 predicted_myland_price_denorm2_df = pd.DataFrame()
 
+
+# 초기 start_date_m 설정
+start_date_m = pd.to_datetime("2017-01-01")
+
 # 반복문을 사용하여 start_date가 2025-01-01이 될 때까지 12개월씩 더함
-while start_date <= end_date:
+while start_date_m <= end_date:
     
     # 데이터 정규화
     scaler_m = RobustScaler()
     
     # start_date 기준으로 데이터를 트리밍
-    economic_data_trimmed_m = economic_data[economic_data.index < start_date]
+    economic_data_trimmed_m = economic_data[economic_data.index < start_date_m]
 
     
     economic_data_trimmed_norm1_m = scaler_m.fit_transform(economic_data_trimmed_m)
@@ -326,7 +330,7 @@ while start_date <= end_date:
     forecast_m = results_m.forecast(economic_data_trimmed_norm_m.values[-maxlags:], forecast_steps_m)  
 
     # 예측된 데이터 프레임으로 변환
-    future_months_m = pd.date_range(start=start_date, periods=forecast_steps_m, freq='12MS')
+    future_months_m = pd.date_range(start=start_date_m, periods=forecast_steps_m, freq='12MS')
     predicted_economic_data_m = pd.DataFrame(forecast_m, columns=economic_columns, index=future_months_m)
 
     predicted_economic_data_m_de = scaler_m.inverse_transform(predicted_economic_data_m)
@@ -336,7 +340,7 @@ while start_date <= end_date:
   
     # scaler2_m 설정 및 데이터 트리밍
     scaler2_m = RobustScaler()
-    data_df_my_m = data_df_my[data_df_my.index < start_date]
+    data_df_my_m = data_df_my[data_df_my.index < start_date_m]
 
     data_df_mylnad_norm1_m = scaler2_m.fit_transform(data_df_my_m)
     data_df_myland_norm_m = pd.DataFrame(data_df_my_land_norm1_m, columns=["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "apt2_price"], index=data_df_apt2_t.index)
@@ -345,8 +349,8 @@ while start_date <= end_date:
     X_m = data_df_myland_norm_m[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]
     y2_m = data_df_myland_norm_m['my_land_price']
 
-    X_trimmed_m = X_m[X_m.index < start_date]
-    y2_trimmed_m = y2_m[y2_m.index < start_date]
+    X_trimmed_m = X_m[X_m.index < start_date_m]
+    y2_trimmed_m = y2_m[y2_m.index < start_date_m]
 
     # Train/Test 분할
     X_trimmed_m_train, X_trimmed_m_test, y2_trimmed_m_train, y2_trimmed_m_test = train_test_split(X_trimmed_m, y2_trimmed_m, test_size=0.2, random_state=20211227)
@@ -394,7 +398,7 @@ while start_date <= end_date:
 
 
     # 6개월씩 더하기
-    start_date += relativedelta(months=12)
+    start_date_m += relativedelta(months=12)
 
 # 최종 예측된 결과 데이터프레임 출력
 st.write(predicted_myland_price_denorm2_df)

@@ -446,8 +446,6 @@ predicted_apt2_price_de = scaler2.inverse_transform(pred_apt2_df)
 predicted_apt2_price_denorm =pd.DataFrame(predicted_apt2_price_de, index=predicted_economic_data.index)
 predicted_apt2_price_denorm2 = predicted_apt2_price_denorm.drop(columns =[0,1,2,3,4])
 
-st.write(predicted_apt2_price_denorm2)
-
 predicted_myland_price_rate_de = scaler3.inverse_transform(pred_myland_df)
 predicted_myland_price_rate_denorm =pd.DataFrame(predicted_myland_price_rate_de, index=predicted_economic_data_jan.index)
 predicted_myland_price_rate_denorm2 = predicted_myland_price_rate_denorm.drop(columns =[0,1,2,3,4])
@@ -459,7 +457,7 @@ df_combined_future.loc[df_combined_future["predicted my_land_price"].isna(), "di
 
 
 # 최종 예측된 결과 데이터프레임 출력
-st.write(df_combined_past)
+st.write(df_combined_future)
 
 
 

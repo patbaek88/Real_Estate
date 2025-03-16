@@ -343,7 +343,7 @@ while start_date_m <= end_date:
     data_df_my_m = data_df_my[data_df_my.index < start_date_m]
 
     data_df_myland_norm1_m = scaler2_m.fit_transform(data_df_my_m)
-    data_df_myland_norm_m = pd.DataFrame(data_df_myland_norm1_m, columns=["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "apt2_price"], index=data_df_apt2_t.index)
+    data_df_myland_norm_m = pd.DataFrame(data_df_myland_norm1_m, columns=["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index", "my_land_price"], index=data_df_my_m).index)
 
     # 특성과 타겟 분리
     X_m = data_df_myland_norm_m[["exchange_rate", "kr_interest_rate", "us_interest_rate", "oil_price", "kr_price_index"]]

@@ -410,7 +410,7 @@ while start_date_m <= end_date:
 
 
     current_land_price_m = data_df_myp_m['my_land_price'].iloc[-1]
-    predicted_my_land_price_m = calculate_future_price_my(current_land_price_m, predicted_myland_price_rate_denorm2.values)
+    predicted_my_land_price_m = calculate_future_price_my(current_land_price_m, predicted_myland_price_rate_denorm2_m.values)
     predicted_my_land_price_df_m = pd.DataFrame(predicted_my_land_price, index = predicted_economic_data_m_jan.index)
     predicted_my_land_price2_m = predicted_my_land_price_df_m*69*2.2/100000000
 

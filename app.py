@@ -189,7 +189,7 @@ for name, model in models_my.items():
 
 
 # 초기 start_date 설정
-start_date = pd.to_datetime("2018-01-01")
+start_date = pd.to_datetime("2020-01-01")
 
 # 6개월씩 더해가며 반복할 때 2025-01-01까지 반복
 end_date = last_time
